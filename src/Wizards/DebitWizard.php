@@ -27,28 +27,6 @@ class DebitWizard extends WizardProvider
     private $webstoreRepository;
 
 
-    private $lang = [
-        'bg' => "bulgarian",
-        'cn' => "chinese",
-        'cz' => "czech",
-        'da' => "danish",
-        'de' => "german",
-        'en' => "english",
-        'es' => "spanish",
-        'fr' => "french",
-        'it' => "italian",
-        'nl' => "dutch",
-        'nn' => "norwegian",
-        'pl' => "polish",
-        'pt' => "portuguese",
-        'ro' => "romanian",
-        'ru' => "russian",
-        'se' => "swedish",
-        'sk' => "slovak",
-        'tr' => "turkish",
-        'vn' => "vietnamese",
-    ];
-
     /**
      * @var Translator
      */
@@ -94,91 +72,101 @@ class DebitWizard extends WizardProvider
                     "title" => $this->translator->trans('Debit::debitWizard.stepOneTitle'),
                     "sections" => [
                         [
-                            "title" => $this->translator->trans('Debit::debitWizard.sectionInfoPageTitle'),
+                            "title" => $this->translator->trans('Debit::debitWizard.sectionNameTitle'),
                             "form" => [
-                                "info_page_type" => [
-                                    'type' => 'select',
-                                    'options' => [
-                                        "required" => true,
-                                        'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageTypeName'),
-                                        'listBoxValues' => [
-                                            [
-                                                "caption" => $this->translator->trans('Debit::debitWizard.infoPageInternal'),
-                                                "value" => 1,
-                                            ],
-                                            [
-                                                "caption" => $this->translator->trans('Debit::debitWizard.infoPageExternal'),
-                                                "value" => 2,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                                "internal_info_page" => [
-                                    'type' => 'number',
-                                    'isVisible' => "info_page_type === 1",
-                                    'options' => [
-                                        'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageNameInternal'),
-                                    ],
-                                ],
-                                "external_info_page" => [
+                                "name" => [
                                     'type' => 'text',
-                                    'isVisible' => "info_page_type === 2",
                                     'options' => [
-                                        'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageNameExternal'),
+                                        'name' => $this->translator->trans('Debit::debitWizard.inputName'),
                                     ],
                                 ],
                             ],
                         ],
-                        [
-                            "title" => $this->translator->trans('Debit::debitWizard.sectionLogoTitle'),
-                            "form" => [
-                                "logo_type" => [
-                                    'type' => 'select',
-                                    'options' => [
-                                        "required" => true,
-                                        'name' => $this->translator->trans('Debit::debitWizard.inputLogoTypeName'),
-                                        'listBoxValues' => [
-                                            [
-                                                "caption" => '',
-                                                "value" => '',
-                                            ],
-                                            [
-                                                "caption" => $this->translator->trans('Debit::debitWizard.logoURL'),
-                                                "value" => 'url',
-                                            ],
-                                            [
-                                                "caption" => $this->translator->trans('Debit::debitWizard.logoDefault'),
-                                                "value" => 'default',
-                                            ],
+                        ["title" => $this->translator->trans('Debit::debitWizard.sectionInfoPageTitle'),
+                        "form" => [
+                            "info_page_type" => [
+                                'type' => 'select',
+                                'options' => [
+                                    "required" => true,
+                                    'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageTypeName'),
+                                    'listBoxValues' => [
+                                        [
+                                            "caption" => $this->translator->trans('Debit::debitWizard.infoPageInternal'),
+                                            "value" => 1,
+                                        ],
+                                        [
+                                            "caption" => $this->translator->trans('Debit::debitWizard.infoPageExternal'),
+                                            "value" => 2,
                                         ],
                                     ],
                                 ],
-                                "external_info_page" => [
-                                    'type' => 'text',
-                                    'isVisible' => "logo_type === 'url'",
-                                    'options' => [
-                                        'name' => $this->translator->trans('Debit::debitWizard.inputLogoURL'),
-                                    ],
+                            ],
+                            "internal_info_page" => [
+                                'type' => 'number',
+                                'isVisible' => "info_page_type === 1",
+                                'options' => [
+                                    'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageNameInternal'),
+                                ],
+                            ],
+                            "external_info_page" => [
+                                'type' => 'text',
+                                'isVisible' => "info_page_type === 2",
+                                'options' => [
+                                    'name' => $this->translator->trans('Debit::debitWizard.inputInfoPageNameExternal'),
                                 ],
                             ],
                         ],
-                        [
-                            "title" => $this->translator->trans('Debit::debitWizard.shippingCountriesTitle'),
-                            "form" => [
-                                "countries" => [
-                                    'type' => 'checkboxGroup',
-                                    'defaultValue' => [],
-                                    'options' => [
-                                        "required" => true,
-                                        'name' => $this->translator->trans('Debit::debitWizard.shippingCountries'),
-                                        'checkboxValues' => $this->getCountriesListForm(),
+                    ],
+                    [
+                        "title" => $this->translator->trans('Debit::debitWizard.sectionLogoTitle'),
+                        "form" => [
+                            "logo_type" => [
+                                'type' => 'select',
+                                'options' => [
+                                    "required" => true,
+                                    'name' => $this->translator->trans('Debit::debitWizard.inputLogoTypeName'),
+                                    'listBoxValues' => [
+                                        [
+                                            "caption" => '',
+                                            "value" => '',
+                                        ],
+                                        [
+                                            "caption" => $this->translator->trans('Debit::debitWizard.logoURL'),
+                                            "value" => 'url',
+                                        ],
+                                        [
+                                            "caption" => $this->translator->trans('Debit::debitWizard.logoDefault'),
+                                            "value" => 'default',
+                                        ],
                                     ],
                                 ],
                             ],
-                        ]
+                            "external_info_page" => [
+                                'type' => 'text',
+                                'isVisible' => "logo_type === 'url'",
+                                'options' => [
+                                    'name' => $this->translator->trans('Debit::debitWizard.inputLogoURL'),
+                                ],
+                            ],
+                        ],
+                    ],
+                    [
+                        "title" => $this->translator->trans('Debit::debitWizard.shippingCountriesTitle'),
+                        "form" => [
+                            "countries" => [
+                                'type' => 'checkboxGroup',
+                                'defaultValue' => [],
+                                'options' => [
+                                    "required" => true,
+                                    'name' => $this->translator->trans('Debit::debitWizard.shippingCountries'),
+                                    'checkboxValues' => $this->getCountriesListForm(),
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
+        ],
         ];
         return $config;
     }
@@ -216,7 +204,7 @@ class DebitWizard extends WizardProvider
         foreach ($webstores as $webstore) {
             $values[] = [
                 "caption" => $webstore->name,
-                "value" => $webstore->storeIdentifier,
+                "value" => $webstore->id,
             ];
         }
 
