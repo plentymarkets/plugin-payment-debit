@@ -5,7 +5,7 @@
   "license"           : "AGPL-3.0",
   "pluginIcon"        : "icon_plugin_xs.png",
   "price"             : 0.00,
-  "description"       : "Invoice plugin for plentymarkets online stores",
+  "description"       : "Debit plugin for plentymarkets online stores",
   "shortDescription"  : {"de": "Zahlungsart Lastschrift für plentymarkets Webshops","en": "Payment method debit for plentymarkets online stores"},
   "categories"        : ["3519"],
   "author"            : "plentymarkets GmbH",
@@ -20,8 +20,14 @@
   "containers"        : [],
   "dataProviders"     :
   [
+      {
+          "key"           :"Debit\\Providers\\Icon\\IconProvider",
+          "name"          :"Debit icon",
+          "description"   :"Display the icon for this payment method"
+      }
   ],
   "dependencies"      : [],
   "runOnBuild"        : [
+      "Debit\\Migrations\\CreateShippingCountrySettings_1_0"
   ]
 }

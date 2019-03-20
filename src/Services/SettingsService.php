@@ -2,6 +2,7 @@
 
 namespace Debit\Services;
 
+use Debit\Models\ShippingCountrySettings;
 use Plenty\Exceptions\ValidationException;
 use Plenty\Modules\Plugin\DataBase\Contracts\DataBase;
 use Plenty\Modules\Plugin\DataBase\Contracts\Query;
@@ -67,14 +68,15 @@ class SettingsService
      */
     public function getSettingsForPlentyId($plentyId, $lang, bool $convertToArray = true)
     {
-
         $lang = $this->checkLanguage($lang);
 
         /** @var Settings $settings */
         $settings = $this->loadClientSettings($plentyId, $lang);
 
+        $shippingSettings = $this->getShippingCountriesByPlentyId($plentyId);
 
-        if($convertToArray && (count($settings) )) {
+        if($convertToArray && (count($settings) || count($shippingSettings)))
+        {
             $outputArray = array();
 
             $availableSettings = Settings::AVAILABLE_SETTINGS;
@@ -82,12 +84,10 @@ class SettingsService
             /** @var Settings $setting */
             foreach ($settings as $setting)
             {
-
                 if (array_key_exists($setting->name, $availableSettings))
                 {
                     $outputArray[$setting->name] = $setting->value;
                 }
-
             }
 
             $outputArray['plentyId']    = $settings[0]->plentyId;
@@ -95,14 +95,12 @@ class SettingsService
 
             $outputArray = $this->convertSettingsToCorrectFormat($outputArray,$availableSettings);
 
-            $outputArray['shippingCountries'] = "";
+            $outputArray['shippingCountries'] = $shippingSettings;
 
             return $outputArray;
-
         }
 
         return $settings;
-
     }
 
     /**
@@ -451,6 +449,41 @@ class SettingsService
             case "float":   return (float)$value;
             case "string":  return (string)$value;
         }
+    }
+
+    /**
+     * Load the current activated shipping countries
+     *
+     * @return mixed|Settings
+     * @throws ValidationException
+     */
+    public function getShippingCountries()
+    {
+        $plentyId = $this->app->getPlentyId();
+
+        return $this->getShippingCountriesByPlentyId($plentyId);
+    }
+
+    /**
+     * Load the activated shipping countries for plentyId
+     *
+     * @return mixed
+     */
+    public function getShippingCountriesByPlentyId($plentyId)
+    {
+        /** @var Query $query */
+        $query = $this->db->query(ShippingCountrySettings::MODEL_NAMESPACE);
+        $query->where('plentyId', '=', $plentyId);
+
+        /** @var ShippingCountrySettings[] $shippingCountrySettings */
+        $shippingCountrySettings = $query->get();
+
+        $shippingCountriesArray = [];
+        foreach($shippingCountrySettings as $shippingSetting){
+            $shippingCountriesArray[] = (int)$shippingSetting->shippingCountryId;
+        }
+
+        return $shippingCountriesArray;
     }
 
 

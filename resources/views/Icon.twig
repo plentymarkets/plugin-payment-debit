@@ -1,0 +1,3 @@
+{% set lang  = debit.sessionStorage.getLang() %}
+{% set name  = debit.settings.getSetting('name', lang) %}
+<img src="{{ plugin_path("Debit") }}/images/icon.png" title="{{ name }}">

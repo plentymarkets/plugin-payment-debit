@@ -2,10 +2,20 @@
 
 namespace Debit\Methods;
 
+use Debit\Helper\DebitHelper;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
+use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
 use Plenty\Modules\Basket\Models\Basket;
+use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
+use Plenty\Modules\Frontend\Contracts\Checkout;
+use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Plugin\Application;
+use Debit\Services\SettingsService;
 
 /**
  * Class DebitPaymentMethod
@@ -13,87 +23,178 @@ use Plenty\Modules\Basket\Models\Basket;
  */
 class DebitPaymentMethod extends PaymentMethodService
 {
+    /** @var BasketRepositoryContract */
+    private $basketRepo;
+
+    /** @var  SettingsService */
+    private $settings;
+
+    /** @var  Checkout */
+    private $checkout;
+
+    /** @var AccountService */
+    protected $accountService;
+
+    /** @var DebitHelper */
+    protected $debitHelper;
+
     /**
-     * Check the configuration if the payment method is active
-     * Return true if the payment method is active, else return false
+     * DebitPaymentMethod constructor.
+     * @param BasketRepositoryContract   $basketRepo
+     * @param SettingsService            $service
+     * @param Checkout                   $checkout
+     * @param AccountService             $accountService
+     * @param DebitHelper                $debitHelper
+     */
+    public function __construct(  BasketRepositoryContract    $basketRepo,
+                                  SettingsService             $service,
+                                  Checkout                    $checkout,
+                                  AccountService              $accountService,
+                                  DebitHelper                 $debitHelper)
+    {
+        $this->basketRepo     = $basketRepo;
+        $this->settings       = $service;
+        $this->checkout       = $checkout;
+        $this->accountService = $accountService;
+        $this->debitHelper    = $debitHelper;
+    }
+
+    /**
+     * Check whether Debit is active or not
      *
-     * @param ConfigRepository $configRepository
-     * @param BasketRepositoryContract $basketRepositoryContract
      * @return bool
      */
-    public function isActive( ConfigRepository $configRepository,
-                              BasketRepositoryContract $basketRepositoryContract):bool
+    public function isActive()
     {
-        /** @var bool $active */
-        $active = true;
-
         /** @var Basket $basket */
-        $basket = $basketRepositoryContract->load();
-
-        /**
-         * Check the shipping profile ID. The ID can be entered in the config.json.
-         */
-        if( $configRepository->get('Debit.shippingProfileId') != $basket->shippingProfileId)
-        {
-            $active = false;
+        $basket = $this->basketRepo->load();
+        if($this->accountService->getIsAccountLoggedIn() && $basket->customerId > 0) {
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+            $contact = $contactRepository->findContactById($basket->customerId);
+            if(!is_null($contact) && $contact instanceof Contact) {
+                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
+                    if($method instanceof ContactAllowedMethodOfPayment) {
+                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed) {
+                            return true;
+                        }
+                    }
+                });
+                if($allowed) {
+                    return true;
+                }
+            }
         }
 
-        return $active;
+        if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
+        {
+            return false;
+        }
+
+        return true;
     }
 
     /**
-     * Get the name of the payment method. The name can be entered in the config.json.
+     * Get DebitSourceUrl
      *
-     * @param ConfigRepository $configRepository
      * @return string
      */
-    public function getName( ConfigRepository $configRepository ):string
+    public function getSourceUrl()
     {
-        $name = $configRepository->get('Debit.name');
+        /** @var FrontendSessionStorageFactoryContract $session */
+        $session = pluginApp(FrontendSessionStorageFactoryContract::class);
+        $lang = $session->getLocaleSettings()->language;
 
-        if(!strlen($name))
+        $infoPageType = $this->settings->getSetting('infoPageType',$lang);
+
+        switch ($infoPageType)
         {
-            $name = 'Debit';
+            case 1:
+                // internal
+                $categoryId = (int) $this->settings->getSetting('infoPageIntern', $lang);
+                if($categoryId  > 0)
+                {
+                    /** @var CategoryRepositoryContract $categoryContract */
+                    $categoryContract = pluginApp(CategoryRepositoryContract::class);
+                    return $categoryContract->getUrl($categoryId, $lang);
+                }
+                return '';
+            case 2:
+                // external
+                return $this->settings->getSetting('infoPageExtern', $lang);
+            default:
+                return '';
         }
+    }
 
+    /**
+     * Get shown name
+     *
+     * @param $lang
+     * @return string
+     */
+    public function getName($lang = 'de')
+    {
+        $name = $this->settings->getSetting('name', $lang);
+        if(!strlen($name) > 0)
+        {
+            return 'Lastschrift';
+        }
         return $name;
-
     }
 
     /**
-     * Get the path of the icon. The URL can be entered in the config.json.
+     * Get Debit Icon
      *
-     * @param ConfigRepository $configRepository
      * @return string
      */
-    public function getIcon( ConfigRepository $configRepository ):string
+    public function getIcon( )
     {
-        if($configRepository->get('Debit.logo') == 1)
+        if( $this->settings->getSetting('logo') == 1)
         {
-            return $configRepository->get('Debit.logo.url');
+            return $this->settings->getSetting('logoUrl');
         }
+        elseif($this->settings->getSetting('logo') == 2)
+        {
+            $app = pluginApp(Application::class);
+            $icon = $app->getUrlPath('debit').'/images/icon.png';
+
+            return $icon;
+        }
+
         return '';
     }
 
     /**
      * Get the description of the payment method. The description can be entered in the config.json.
      *
-     * @param ConfigRepository $configRepository
      * @return string
      */
-    public function getDescription( ConfigRepository $configRepository ):string
+    public function getDescription():string
     {
-        if($configRepository->get('Debit.infoPage.type') == 1)
-        {
-            return $configRepository->get('Debit.infoPage.intern');
-        }
-        elseif ($configRepository->get('Debit.infoPage.type') == 2)
-        {
-            return $configRepository->get('Debit.infoPage.extern');
-        }
-        else
-        {
-            return '';
-        }
+        /** @var FrontendSessionStorageFactoryContract $session */
+        $session = pluginApp(FrontendSessionStorageFactoryContract::class);
+        $lang = $session->getLocaleSettings()->language;
+        return $this->settings->getSetting('description', $lang);
+    }
+
+    /**
+     * Check if it is allowed to switch to this payment method
+     *
+     * @return bool
+     */
+    public function isSwitchableTo()
+    {
+        return true;
+    }
+
+    /**
+     * Check if it is allowed to switch from this payment method
+     *
+     * @return bool
+     */
+    public function isSwitchableFrom()
+    {
+        return true;
     }
 }
