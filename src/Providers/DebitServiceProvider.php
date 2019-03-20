@@ -2,8 +2,10 @@
 
 namespace Debit\Providers;
 
+use Debit\Wizards\DebitWizard;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
+use Plenty\Modules\Wizard\Contracts\WizardContainerContract;
 use Plenty\Plugin\ServiceProvider;
 use Debit\Helper\DebitHelper;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodContainer;
@@ -32,16 +34,20 @@ use Plenty\Modules\Basket\Events\Basket\AfterBasketCreate;
       * @param DebitHelper $paymentHelper
       * @param PaymentMethodContainer $payContainer
       * @param Dispatcher $eventDispatcher
+      * @param WizardContainerContract $wizardContainerContract
       */
      public function boot(  DebitHelper $paymentHelper,
                             PaymentMethodContainer $payContainer,
-                            Dispatcher $eventDispatcher)
+                            Dispatcher $eventDispatcher,
+                            WizardContainerContract $wizardContainerContract)
      {
 
          // Register the debit payment method in the payment method container
          $payContainer->register('plenty::DEBIT', DebitPaymentMethod::class,
                                 [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class ]
          );
+
+         $wizardContainerContract->register('payment-debit-wizard', DebitWizard::class);
 
          // Listen for the event that gets the payment method content
          $eventDispatcher->listen(GetPaymentMethodContent::class,
