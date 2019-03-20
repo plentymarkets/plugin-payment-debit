@@ -51,7 +51,8 @@ class DebitWizard extends WizardProvider
     {
         $config = [
             "title" => 'debitWizard.wizardTitle',
-            "iconPath" => "https://avoro.eu/templates/avoro/img/banktransfer.png",
+            //"iconPath" => "https://avoro.eu/templates/avoro/img/banktransfer.png",
+            "iconPath" => "https://cdn.plentymarkets.eu/item/images/5982/full/5982.jpg",
             "settingsHandlerClass" => DebitWizardSettingsHandler::class,
             "translationNamespace" => "Debit",
             "key" => "payment-debit-wizard",
