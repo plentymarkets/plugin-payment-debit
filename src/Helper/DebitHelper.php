@@ -2,8 +2,14 @@
 
 namespace Debit\Helper;
 
+use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
+use Plenty\Modules\Payment\Models\Payment;
 
 /**
  * Class DebitHelper
@@ -36,8 +42,8 @@ class DebitHelper
         if($this->getDebitMopId() == 'no_paymentmethod_found')
         {
             $paymentMethodData = array( 'pluginKey' => 'plenty',
-                'paymentKey' => 'debit',
-                'name' => 'Debit');
+                'paymentKey' => 'DEBIT',
+                'name' => 'debit');
 
             $this->paymentMethodRepository->createPaymentMethod($paymentMethodData);
         }
@@ -57,7 +63,7 @@ class DebitHelper
         {
             foreach($paymentMethods as $paymentMethod)
             {
-                if($paymentMethod->paymentKey == 'debit')
+                if($paymentMethod->paymentKey == 'DEBIT')
                 {
                     return $paymentMethod->id;
                 }
@@ -65,5 +71,61 @@ class DebitHelper
         }
 
         return 'no_paymentmethod_found';
+    }
+
+    /**
+     * Create a payment in plentymarkets
+     *
+     * @param array $paypalPaymentData
+     * @param array $paymentData
+     * @return Payment
+     */
+    public function createPlentyPayment()
+    {
+        /** @var Payment $payment */
+        $payment = pluginApp(Payment::class);
+
+        $payment->mopId             = $this->getDebitMopId();
+        $payment->transactionType   = Payment::TRANSACTION_TYPE_BOOKED_POSTING;
+        $payment->status            = Payment::STATUS_APPROVED;
+        $payment->unaccountable     = 1;
+        $payment->regenerateHash    = true;
+
+        /** @var PaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
+        $payment = $paymentRepo->createPayment($payment);
+
+        return $payment;
+    }
+
+    /**
+     * Assign the payment to an order in plentymarkets
+     *
+     * @param Payment   $payment
+     * @param int       $orderId
+     */
+    public function assignPlentyPaymentToPlentyOrder(Payment $payment, int $orderId)
+    {
+        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+        /** @var OrderRepositoryContract $orderContract */
+        $orderContract = pluginApp(OrderRepositoryContract::class);
+
+        /** @var Order $order */
+        // use processUnguarded to find orders for guests
+        $order = $authHelper->processUnguarded(
+            function () use ($orderContract, $orderId) {
+                //unguarded
+                return $orderContract->findOrderById($orderId, ['relation']);
+            }
+        );
+        // Check whether the order truly exists in plentymarkets
+        if(!is_null($order) && $order instanceof Order)
+        {
+            // Assign the given payment to the given order
+            /** @var PaymentOrderRelationRepositoryContract $paymentOrderRelationRepo */
+            $paymentOrderRelationRepo = pluginApp(PaymentOrderRelationRepositoryContract::class);
+            $paymentOrderRelationRepo->createOrderRelation($payment, $order);
+        }
     }
 }

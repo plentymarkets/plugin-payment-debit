@@ -24,10 +24,16 @@
           "key"           :"Debit\\Providers\\Icon\\IconProvider",
           "name"          :"Debit icon",
           "description"   :"Display the icon for this payment method"
+      },
+      {
+          "key"           :"Debit\\Providers\\DebitOrderConfirmationDataProvider",
+          "name"          :"Debit bank details",
+          "description"   :"Display the bank details on the order confirmation page"
       }
   ],
   "dependencies"      : [],
   "runOnBuild"        : [
+      "Debit\\Migrations\\CreateSettings_1_0_0",
       "Debit\\Migrations\\CreateShippingCountrySettings_1_0"
   ]
 }

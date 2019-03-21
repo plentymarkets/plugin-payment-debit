@@ -1,0 +1,52 @@
+
+	<form :id="'bankAccount-input-form_' + _uid">
+			<div class="modal-header">
+				<button class="close" >
+					<span aria-hidden="true">x</span>
+				</button>
+				<h4 class="modal-title">{{ trans("Debit::PaymentMethod.bankDetails") }}</h4>
+			</div>
+
+            <div class="modal-body form-horizontal row">
+                <div class="col-xs-12">
+                    <div class="input-unit">
+                        <label :for="'bankAccountOwner-input_' + _uid">{{ trans("Debit::PaymentMethod.bankAccountOwner") }} *</label>
+                        <input type="text" :id="'bankAccountOwner-input_' + _uid" v-model="bankAccountOwner" value={{ bankAccountOwner }}>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit" data-validate="text">
+                            <label :for="'bankName-input-id_' + _uid">{{ trans("Debit::PaymentMethod.bankName") }} *</label>
+                            <input type="text" :id="'bankName-input-id_' + _uid" v-model="bankName" value={{ bankName }}>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit" data-validate="text">
+                            <label :for="'bankIban-input-id_' + _uid">{{ trans("Debit::PaymentMethod.bankIban") }} *</label>
+                            <input type="text" :id="'bankIban-input-id_' + _uid" v-model="bankIban" value={{ bankIban }}>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit" data-validate="text">
+                            <label :for="'bankSwift-input-id_' + _uid">{{ trans("Debit::PaymentMethod.bankSwift") }} *</label>
+                            <input type="text" :id="'bankSwift-input-id_' + _uid" v-model="bankSwift"  value={{ bankSwift }}>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            	<button type="button" class="btn btn-block" :class="buttonClasses" @click="validateData" :disabled="isDisabled">
+                	<i v-waiting-animation="isDisabled" class="fa fa-arrow-right" aria-hidden="true"></i>
+                   	{{ trans("Debit::PaymentMethod.bankAccountButtonLabel") }}
+            	</button>
+            </div>
+    </form>

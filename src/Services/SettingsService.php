@@ -79,7 +79,25 @@ class SettingsService
         {
             $outputArray = array();
 
-            $availableSettings = Settings::AVAILABLE_SETTINGS;
+            $availableSettings = array(        "plentyId"                         => "int"     ,
+                "lang"                             => "string"  ,
+                "name"                             => "string"  ,
+                "infoPageType"                     => "int"     ,
+                "infoPageIntern"                   => "int"     ,
+                "infoPageExtern"                   => "string"  ,
+                "logo"                             => "int"     ,
+                "logoUrl"                          => "string"  ,
+                "description"                      => "string"  ,
+                "feeDomestic"                      => "float"   ,
+                "feeForeign"                       => "float"   ,
+                "showBankData"                     => "bool"    ,
+                "designatedUse"                    => "string"  ,
+                "showDesignatedUse"                => "bool"    ,
+                "invoiceEqualsShippingAddress"     => "bool"    ,
+                "disallowInvoiceForGuest"          => "bool"    ,
+                "quorumOrders"                     => "int"     ,
+                "minimumAmount"                    => "float"   ,
+                "maximumAmount"                    => "float"   );
 
             /** @var Settings $setting */
             foreach ($settings as $setting)
@@ -112,53 +130,6 @@ class SettingsService
      */
     public function saveSettings($data)
     {
-        $pid    = $data['plentyId'];
-        $lang   = $data['lang'];
-        unset( $data['lang']);
-        unset( $data['plentyId']);
-
-        if(count($data) > 0 && !empty($pid))
-        {
-            $settingsToSave = $this->convertSettingsToCorrectFormat($data, Settings::AVAILABLE_SETTINGS);
-
-            /** @var Settings[] $settings */
-            $settings = $this->loadClientSettings($pid, $lang);
-
-            $newLang = true;
-
-            /** @var Settings $setting */
-            foreach ($settings as $setting)
-            {
-                if (array_key_exists($setting->name, $settingsToSave))
-                {
-                    $setting->value     = (string)$settingsToSave[$setting->name];
-                    $setting->updatedAt = date('Y-m-d H:i:s');
-
-                    $this->db->save($setting);
-
-                    if($setting->name == 'name'){
-                        $newLang = false;
-                    }
-                }
-            }
-            if($newLang){
-                foreach ($settingsToSave as $name => $value) {
-                    if(!in_array($name,['feeDomestic','feeForeign','showBankData','plentyId','lang',
-                                        'invoiceEqualsShippingAddress','disallowInvoiceForGuest','quorumOrders','minimumAmount','maximumAmount'])){
-                        $newSetting = pluginApp(Settings::class);
-                        $newSetting->plentyId = $pid;
-                        $newSetting->lang = $lang;
-                        $newSetting->name = $name;
-                        $newSetting->value = $value;
-                        $newSetting->updatedAt = date('Y-m-d H:i:s');
-                        $this->db->save($newSetting);
-                    }
-                }
-            }
-
-            return 1;
-        }
-
         return 0;
     }
 
@@ -173,14 +144,14 @@ class SettingsService
      */
     public function createInitialSettingsForPlentyId($plentyId, $lang)
     {
-        $generatedSettings    = $this->createLangIndependentInitialSettings($plentyId);
+       /* $generatedSettings    = $this->createLangIndependentInitialSettings($plentyId);
 
         foreach( Settings::AVAILABLE_SETTINGS as $setting => $type)
         {
             if($setting != 'plentyId' && $setting != 'lang' && !in_array($setting, Settings::LANG_INDEPENDENT_SETTINGS))
             {
                 /** @var Settings $newSetting */
-                $newSetting            = pluginApp(Settings::class);
+           /*     $newSetting            = pluginApp(Settings::class);
                 $newSetting->plentyId  = $plentyId;
                 $newSetting->lang      = $lang;
                 $newSetting->name      = $setting;
@@ -204,7 +175,7 @@ class SettingsService
             }
         }
 
-        return $generatedSettings;
+        return $generatedSettings;*/
     }
 
     /**
@@ -219,12 +190,12 @@ class SettingsService
         $generatedSettings = array();
 
         /** @var Settings[] $storedSettings */
-        $storedSettings = $this->db->query(Settings::MODEL_NAMESPACE)->where('plentyId', '=', $plentyId)
+       /* $storedSettings = $this->db->query(Settings::MODEL_NAMESPACE)->where('plentyId', '=', $plentyId)
             ->where('lang', '=', '')->get();
 
         $settingIds = array();
         /** @var Settings $storedSetting */
-        foreach($storedSettings as $storedSetting)
+        /*foreach($storedSettings as $storedSetting)
         {
             $settingIds[$storedSetting->name] = $storedSetting->id;
         }
@@ -234,7 +205,7 @@ class SettingsService
             if($setting != 'plentyId' && $setting != 'lang')
             {
                 /** @var Settings $newSetting */
-                $newSetting            = pluginApp(Settings::class);
+        /*        $newSetting            = pluginApp(Settings::class);
                 if(array_key_exists($setting, $settingIds) && !empty($settingIds[$setting]))
                 {
                     $newSetting->id = $settingIds[$setting];
@@ -248,7 +219,7 @@ class SettingsService
 
                 $generatedSettings[] = $this->db->save($newSetting);
             }
-        }
+        }*/
 
         return $generatedSettings;
     }
@@ -288,10 +259,10 @@ class SettingsService
      */
     private function checkLanguage($lang)
     {
-        if(!in_array($lang, Settings::AVAILABLE_LANGUAGES))
+       /* if(!in_array($lang, Settings::AVAILABLE_LANGUAGES))
         {
             $lang = Settings::DEFAULT_LANGUAGE;
-        }
+        }*/
         return $lang;
     }
 
@@ -338,27 +309,27 @@ class SettingsService
      */
     private function updateClients()
     {
-        $clients = $this->getClients();
+        /*$clients = $this->getClients();
 
         foreach($clients as $plentyId)
         {
             /** @var Settings[] $query */
-            $query = $this->db->query(Settings::MODEL_NAMESPACE)
-                ->where('plentyId', '=', $plentyId )->get();
+        /*      $query = $this->db->query(Settings::MODEL_NAMESPACE)
+                  ->where('plentyId', '=', $plentyId )->get();
 
-            if( !count($query) > 0 || !$this->areAllLanguagesAvailable($query))
-            {
-                $storedLangs = $this->detectStoredLanguages($query);
+              if( !count($query) > 0 || !$this->areAllLanguagesAvailable($query))
+              {
+                  $storedLangs = $this->detectStoredLanguages($query);
 
-                foreach(Settings::AVAILABLE_LANGUAGES as $lang)
-                {
-                    if(!in_array($lang, $storedLangs))
-                    {
-                        $this->createInitialSettingsForPlentyId($plentyId, $lang);
-                    }
-                }
-            }
-        }
+                  foreach(Settings::AVAILABLE_LANGUAGES as $lang)
+                  {
+                      if(!in_array($lang, $storedLangs))
+                      {
+                          $this->createInitialSettingsForPlentyId($plentyId, $lang);
+                      }
+                  }
+              }
+          }*/
 
     }
 
@@ -371,7 +342,7 @@ class SettingsService
      */
     private function areAllLanguagesAvailable(array $settings)
     {
-        $languages = $this->detectStoredLanguages($settings);
+        /*$languages = $this->detectStoredLanguages($settings);
 
         foreach(Settings::AVAILABLE_LANGUAGES as $lang)
         {
@@ -379,7 +350,7 @@ class SettingsService
             {
                 return false;
             }
-        }
+        }*/
         return true;
     }
 

@@ -1,0 +1,17 @@
+{
+  "sections":
+  [
+    {
+      "name": "MultilingualismConfig.bankData",
+      "prefix": "bank"
+    },
+    {
+      "name": "MultilingualismConfig.reinit",
+      "prefix": "reinit"
+    }
+  ],
+  "ignoredTranslationFiles":
+  [
+    "MultilingualismConfig.properties"
+  ]
+}
