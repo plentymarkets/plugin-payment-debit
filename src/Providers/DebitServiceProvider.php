@@ -91,6 +91,8 @@ class DebitServiceProvider extends ServiceProvider
                     }
 
                     $event->setValue($twig->render('Debit::BankDetailsOverlay', [
+                        "checkout"          => "true",
+                        "action"            => "payment/debit/bankdetails",
                         "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
                         "bankName"          => $bankAccount['bankName'],
                         "bankIban"          => $bankAccount['bankIban'],
@@ -106,6 +108,9 @@ class DebitServiceProvider extends ServiceProvider
             {
                 if($event->getMop() == $paymentHelper->getDebitMopId())
                 {
+                    // Save orderId to ContactBank
+                    $paymentHelper->updateContactBank($event->getOrderId());
+
                     // Create a plentymarkets payment
                     $plentyPayment = $paymentHelper->createPlentyPayment();
 

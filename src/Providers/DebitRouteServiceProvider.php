@@ -21,7 +21,9 @@ class DebitRouteServiceProvider extends RouteServiceProvider
                 $routerApi->put('payment/debit/settings', ['uses' => 'Debit\Controllers\SettingsController@saveSettings']);
             });
 
-        $router->get('payment/debit/bankdetails', 'Debit\Controllers\DebitController@getBankDetails');
+        $router->get('payment/debit/bankdetails/{orderId}', 'Debit\Controllers\DebitController@getBankDetails');
+        $router->post('payment/debit/bankdetails', 'Debit\Controllers\DebitController@setBankDetails');
+        $router->post('payment/debit/updateBankDetails', 'Debit\Controllers\DebitController@updateBankDetails');
     }
 
 }

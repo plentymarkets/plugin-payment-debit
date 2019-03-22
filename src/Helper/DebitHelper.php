@@ -2,6 +2,9 @@
 
 namespace Debit\Helper;
 
+use Debit\Services\SessionStorageService;
+use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
+use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
@@ -18,19 +21,27 @@ use Plenty\Modules\Payment\Models\Payment;
  */
 class DebitHelper
 {
+    private $contactBank;
+
     /**
      * @var PaymentMethodRepositoryContract $paymentMethodRepository
      */
     private $paymentMethodRepository;
 
     /**
+     * @var SessionStorageService $sessionStorageService
+     */
+    private $sessionStorageService;
+
+    /**
      * DebitHelper constructor.
      *
      * @param PaymentMethodRepositoryContract $paymentMethodRepository
      */
-    public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository)
+    public function __construct(PaymentMethodRepositoryContract $paymentMethodRepository, SessionStorageService $sessionStorageService)
     {
         $this->paymentMethodRepository = $paymentMethodRepository;
+        $this->sessionStorageService = $sessionStorageService;
     }
 
     /**
@@ -127,5 +138,48 @@ class DebitHelper
             $paymentOrderRelationRepo = pluginApp(PaymentOrderRelationRepositoryContract::class);
             $paymentOrderRelationRepo->createOrderRelation($payment, $order);
         }
+    }
+
+    /**
+     * @param int $contactBankId
+     */
+    public function setContactBank($contactBankId)
+    {
+        $this->sessionStorageService->setSessionValue('contactBankId', $contactBankId);
+    }
+
+    /**
+     * @return ContactBank $contactBank
+     */
+    public function getContactBank()
+    {
+        return $this->contactBank;
+    }
+
+    /**
+     * Set orderId for ContactBank
+     *
+     * @param int $orderId
+     */
+    public function updateContactBank($orderId)
+    {
+        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        $contactBank = $this->sessionStorageService->getSessionValue('contactBank');
+        $bankData = [
+            'id'            => $contactBank->id,
+            'orderId'       => $orderId,
+            'accountOwner'  => $contactBank->accountOwner,
+            'iban'          => $contactBank->iban,
+            'lastUpdateBy'  => 'customer'
+        ];
+
+        /** @var ContactPaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
+
+        $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
+            return $paymentRepo->updateContactBank($bankData, $bankData['id']);
+        });
     }
 }

@@ -8,7 +8,7 @@
   "description"       : "Debit plugin for plentymarkets online stores",
   "shortDescription"  : {"de": "Zahlungsart Lastschrift für plentymarkets Webshops","en": "Payment method debit for plentymarkets online stores"},
   "categories"        : ["3519"],
-  "author"            : "plentymarkets GmbH",
+  "author"            : "plentymarkets AG",
   "authorIcon"        : "icon_author_xs.png",
   "email"             : "sales@plentymarkets.com",
   "phone"             : "+49 561 98 681 100",
@@ -26,9 +26,14 @@
           "description"   :"Display the icon for this payment method"
       },
       {
-          "key"           :"Debit\\Providers\\DebitOrderConfirmationDataProvider",
-          "name"          :"Debit bank details",
-          "description"   :"Display the bank details on the order confirmation page"
+          "key" :"Debit\\Providers\\DataProvider\\DebitReinitializePayment",
+          "name":"Debit Reinitialize Payment",
+          "description":"Display the Debit Button after the Payment changed to Debit"
+      },
+      {
+          "key":"Debit\\Providers\\DataProvider\\DebitReinitializePaymentScript",
+          "name":"Debit Reinitialize Payment Script",
+          "description":"A Script for displaying the Debit Button after the Payment changed to Debit"
       }
   ],
   "dependencies"      : [],
