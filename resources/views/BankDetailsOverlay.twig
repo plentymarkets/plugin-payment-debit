@@ -2,16 +2,15 @@
 	<form :id="bankAccount-input-form" action={{ action }} method="post">
 		<input type="hidden" name="bankId" 	value={{ bankId }}>
 		<input type="hidden" name="orderId" value={{ orderId }}>
-
 			<div class="modal-header">
 				{% if checkout|trim is empty %}
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 						<span aria-hidden="true">x</span>
 					</button>
 				{% else %}
-					<button class="close" >
-                    	<span aria-hidden="true">x</span>
-                    </button>
+					<button type="button" onClick="window.location.reload()" class="close">
+						<span aria-hidden="true">x</span>
+					</button>
 				{% endif %}
 				<h4 class="modal-title">{{ trans("Debit::PaymentMethod.bankDetails") }}</h4>
 			</div>
