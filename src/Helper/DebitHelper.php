@@ -69,7 +69,7 @@ class DebitHelper
      */
     public function getDebitMopId()
     {
-        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plenty');
+        $paymentMethods = $this->paymentMethodRepository->allForPlugin('plentyDebit');
 
         if( !is_null($paymentMethods) )
         {
