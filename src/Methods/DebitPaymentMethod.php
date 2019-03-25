@@ -118,7 +118,7 @@ class DebitPaymentMethod extends PaymentMethodService
                 }
                 return '';
             case 'external':
-                return $this->settings->getSetting('internal_info_page');
+                return $this->settings->getSetting('external_info_page');
             default:
                 return '';
         }
@@ -144,6 +144,16 @@ class DebitPaymentMethod extends PaymentMethodService
         }
 
         return '';
+    }
+
+    /**
+     * Get shown name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return trans("Debit::PaymentMethod.paymentMethodName");
     }
 
     /**
