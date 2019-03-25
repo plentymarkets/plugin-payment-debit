@@ -9,15 +9,46 @@ use Plenty\Plugin\Http\Response;
 
 class SettingsController extends Controller
 {
+    /**
+     * @var SettingsService
+     */
+    protected $settingsService;
 
-    public function loadSettings(Response $response, SettingsService $service, $plentyId, $lang)
+    /**
+     * SettingsController constructor.
+     * @param SettingsService $settingsService
+     */
+    public function __construct(SettingsService $settingsService)
     {
-        return $response->json($service->getSettingsForPlentyId($plentyId, $lang));
+        $this->settingsService = $settingsService;
     }
 
-    public function saveSettings(Request $request, Response $response, SettingsService $service)
+    /**
+     * @param Request $request
+     * @return array
+     */
+    public function saveSettings(Request $request)
     {
-        return $response->json($service->saveSettings($request->except(['plentyMarkets'])));
+        return $this->settingsService->saveSettings("", $request->get('settings'));
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    public function loadSettings($settingType)
+    {
+        return $this->settingsService->loadSettings($settingType);
+    }
+
+    /**
+     * Load the settings for one webshop
+     *
+     * @param $webstore
+     * @return bool
+     */
+    public function loadSetting($webstore, $mode)
+    {
+        return $this->settingsService->loadSetting($webstore, $mode);
     }
 
 }

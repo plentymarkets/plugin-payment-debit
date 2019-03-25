@@ -2,6 +2,7 @@
 
 namespace Debit\Controllers;
 
+use Debit\Helper\DebitHelper;
 use Debit\Services\SessionStorageService;
 use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
@@ -9,6 +10,7 @@ use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Authorization\Services\AuthHelper;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
+use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
@@ -55,14 +57,14 @@ class DebitController extends Controller
                 $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                 $bankAccount['bankName']         =	$bank->bankName;
                 $bankAccount['bankIban']	     =	$bank->iban;
-                $bankAccount['bankSwift']		 =	$bank->bic;
+                $bankAccount['bankBic']		 =	$bank->bic;
                 $bankAccount['bankId']		     =	0;
             }
         } else {
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
             $bankAccount['bankName']         =	$contactBank->bankName;
             $bankAccount['bankIban']	     =	$contactBank->iban;
-            $bankAccount['bankSwift']		 =	$contactBank->bic;
+            $bankAccount['bankBic']		 =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
         }
 
@@ -71,7 +73,7 @@ class DebitController extends Controller
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
             "bankName"          => $bankAccount['bankName'],
             "bankIban"          => $bankAccount['bankIban'],
-            "bankSwift"         => $bankAccount['bankSwift'],
+            "bankBic"         => $bankAccount['bankBic'],
             "bankId"            => $bankAccount['bankId'],
             "orderId"           => $orderId,
         ]);
@@ -92,7 +94,7 @@ class DebitController extends Controller
             'accountOwner'  => $_REQUEST['bankAccountOwner'],
             'bankName'      => $_REQUEST['bankName'],
             'iban'          => $_REQUEST['bankIban'],
-            'bic'           => $_REQUEST['bankSwift'],
+            'bic'           => $_REQUEST['bankBic'],
             'lastUpdateBy'  => 'customer'
         ];
 
@@ -121,7 +123,7 @@ class DebitController extends Controller
             'accountOwner'  => $_REQUEST['bankAccountOwner'],
             'bankName'      => $_REQUEST['bankName'],
             'iban'          => $_REQUEST['bankIban'],
-            'bic'           => $_REQUEST['bankSwift'],
+            'bic'           => $_REQUEST['bankBic'],
             'lastUpdateBy'  => 'customer',
             'orderId'       => $_REQUEST['orderId']
         ];
@@ -133,6 +135,16 @@ class DebitController extends Controller
         } else {
             //create new bank account
             $this->createContactBank($bankData);
+        }
+
+        /** @var DebitHelper $debitHelper */
+        $debitHelper = pluginApp(DebitHelper::class);
+        // Create a plentymarkets payment
+        $plentyPayment = $debitHelper->createPlentyPayment($_REQUEST['orderId']);
+
+        if($plentyPayment instanceof Payment) {
+            // Assign the payment to an order in plentymarkets
+            $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $_REQUEST['orderId']);
         }
 
         return $response->redirectTo('my-account');

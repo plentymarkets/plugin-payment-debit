@@ -51,8 +51,7 @@ class DebitWizard extends WizardProvider
     {
         $config = [
             "title" => 'debitWizard.wizardTitle',
-            //"iconPath" => "https://avoro.eu/templates/avoro/img/banktransfer.png",
-            "iconPath" => "https://cdn.plentymarkets.eu/item/images/5982/full/5982.jpg",
+            "iconPath" => "",
             "settingsHandlerClass" => DebitWizardSettingsHandler::class,
             "translationNamespace" => "Debit",
             "key" => "payment-debit-wizard",
@@ -74,17 +73,27 @@ class DebitWizard extends WizardProvider
                     "title" => 'debitWizard.stepOneTitle',
                     "sections" => [
                         [
-                            "title" => 'debitWizard.sectionNameTitle',
+                            "title" => 'debitWizard.shippingCountriesTitle',
                             "form" => [
-                                "name" => [
-                                    'type' => 'text',
+                                "countries" => [
+                                    'type' => 'checkboxGroup',
+                                    'defaultValue' => [],
                                     'options' => [
-                                        'name' => 'debitWizard.inputName',
+                                        "required" => true,
+                                        'name' => 'debitWizard.shippingCountries',
+                                        'checkboxValues' => $this->getCountriesListForm(),
                                     ],
                                 ],
                             ],
                         ],
-                        ["title" => 'debitWizard.sectionInfoPageTitle',
+                    ],
+                ],
+
+                "stepTwo" => [
+                    "title" => 'debitWizard.stepTwoTitle',
+                    "sections" => [
+                        [
+                            "title" => 'debitWizard.sectionInfoPageTitle',
                             "form" => [
                                 "info_page_type" => [
                                     'type' => 'select',
@@ -156,24 +165,10 @@ class DebitWizard extends WizardProvider
                                     ],
                                 ],
                             ],
-                        ],
-                        [
-                            "title" => 'debitWizard.shippingCountriesTitle',
-                            "form" => [
-                                "countries" => [
-                                    'type' => 'checkboxGroup',
-                                    'defaultValue' => [],
-                                    'options' => [
-                                        "required" => true,
-                                        'name' => 'debitWizard.shippingCountries',
-                                        'checkboxValues' => $this->getCountriesListForm(),
-                                    ],
-                                ],
-                            ],
-                        ],
+                        ]
                     ],
-                ],
-            ],
+                ]
+            ]
         ];
         return $config;
     }

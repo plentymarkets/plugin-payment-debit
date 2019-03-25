@@ -13,6 +13,7 @@ use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Models\PaymentProperty;
 
 /**
  * Class DebitHelper
@@ -87,11 +88,10 @@ class DebitHelper
     /**
      * Create a payment in plentymarkets
      *
-     * @param array $paypalPaymentData
-     * @param array $paymentData
+     * @param int $orderId
      * @return Payment
      */
-    public function createPlentyPayment()
+    public function createPlentyPayment($orderId)
     {
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
@@ -102,11 +102,23 @@ class DebitHelper
         $payment->unaccountable     = 1;
         $payment->regenerateHash    = true;
 
+        /** @var PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $paymentProperty->typeId = 1;
+        $paymentProperty->value = $orderId;
+        $paymentProperties[] = $paymentProperty;
+
+        $payment->properties     = $paymentProperties;
+
         /** @var PaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(PaymentRepositoryContract::class);
-        $payment = $paymentRepo->createPayment($payment);
+        $orderPayment = $paymentRepo->getPaymentsByOrderId($orderId);
 
-        return $payment;
+        if ($orderPayment == null) {
+            $orderPayment = $paymentRepo->createPayment($payment);
+        }
+
+        return $orderPayment;
     }
 
     /**

@@ -5,7 +5,6 @@ namespace Debit\Methods;
 use Debit\Helper\DebitHelper;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -105,13 +104,12 @@ class DebitPaymentMethod extends PaymentMethodService
         $session = pluginApp(FrontendSessionStorageFactoryContract::class);
         $lang = $session->getLocaleSettings()->language;
 
-        $infoPageType = $this->settings->getSetting('infoPageType',$lang);
+        $infoPageType = $this->settings->getSetting('info_page_type');
 
         switch ($infoPageType)
         {
-            case 1:
-                // internal
-                $categoryId = (int) $this->settings->getSetting('infoPageIntern', $lang);
+            case 'internal':
+                $categoryId = (int) $this->settings->getSetting('internal_info_page');
                 if($categoryId  > 0)
                 {
                     /** @var CategoryRepositoryContract $categoryContract */
@@ -119,28 +117,11 @@ class DebitPaymentMethod extends PaymentMethodService
                     return $categoryContract->getUrl($categoryId, $lang);
                 }
                 return '';
-            case 2:
-                // external
-                return $this->settings->getSetting('infoPageExtern', $lang);
+            case 'external':
+                return $this->settings->getSetting('internal_info_page');
             default:
                 return '';
         }
-    }
-
-    /**
-     * Get shown name
-     *
-     * @param $lang
-     * @return string
-     */
-    public function getName($lang = 'de')
-    {
-        $name = $this->settings->getSetting('name', $lang);
-        if(!strlen($name) > 0)
-        {
-            return 'Lastschrift';
-        }
-        return $name;
     }
 
     /**
@@ -150,32 +131,29 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function getIcon( )
     {
-        if( $this->settings->getSetting('logo') == 1)
-        {
-            return $this->settings->getSetting('logoUrl');
-        }
-        elseif($this->settings->getSetting('logo') == 2)
+        if( $this->settings->getSetting('logo_type') == 'default')
         {
             $app = pluginApp(Application::class);
             $icon = $app->getUrlPath('debit').'/images/icon.png';
 
             return $icon;
         }
+        elseif($this->settings->getSetting('logo_type') != 'default')
+        {
+            return $this->settings->getSetting('logo_type');
+        }
 
         return '';
     }
 
     /**
-     * Get the description of the payment method. The description can be entered in the config.json.
+     * Get the description of the payment method.
      *
      * @return string
      */
     public function getDescription():string
     {
-        /** @var FrontendSessionStorageFactoryContract $session */
-        $session = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $lang = $session->getLocaleSettings()->language;
-        return $this->settings->getSetting('description', $lang);
+        return $this->settings->getSetting('description');
     }
 
     /**
@@ -185,7 +163,7 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function isSwitchableTo()
     {
-        return true;
+        return false;
     }
 
     /**
@@ -195,6 +173,6 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function isSwitchableFrom()
     {
-        return true;
+        return false;
     }
 }

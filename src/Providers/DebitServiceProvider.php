@@ -86,7 +86,7 @@ class DebitServiceProvider extends ServiceProvider
                             $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                             $bankAccount['bankName']         =	$bank->bankName;
                             $bankAccount['bankIban']	     =	$bank->iban;
-                            $bankAccount['bankSwift']		 =	$bank->bic;
+                            $bankAccount['bankBic']		 =	$bank->bic;
                         }
                     }
 
@@ -96,7 +96,7 @@ class DebitServiceProvider extends ServiceProvider
                         "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
                         "bankName"          => $bankAccount['bankName'],
                         "bankIban"          => $bankAccount['bankIban'],
-                        "bankSwift"         => $bankAccount['bankSwift']
+                        "bankBic"           => $bankAccount['bankBic']
                     ]));
                     $event->setType('htmlContent');
                 }
@@ -112,7 +112,7 @@ class DebitServiceProvider extends ServiceProvider
                     $paymentHelper->updateContactBank($event->getOrderId());
 
                     // Create a plentymarkets payment
-                    $plentyPayment = $paymentHelper->createPlentyPayment();
+                    $plentyPayment = $paymentHelper->createPlentyPayment($event->getOrderId());
 
                     if($plentyPayment instanceof Payment) {
                         // Assign the payment to an order in plentymarkets
