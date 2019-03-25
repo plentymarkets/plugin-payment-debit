@@ -53,7 +53,7 @@ class DebitHelper
         // Check whether the ID of the debit payment method has been created
         if($this->getDebitMopId() == 'no_paymentmethod_found')
         {
-            $paymentMethodData = array( 'pluginKey' => 'plenty',
+            $paymentMethodData = array( 'pluginKey' => 'plentyDebit',
                 'paymentKey' => 'DEBIT',
                 'name' => 'debit');
 
