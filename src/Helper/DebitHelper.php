@@ -122,6 +122,18 @@ class DebitHelper
         $bicPaymentProperty->value = $contactBank->bic;
         $paymentProperties[] = $bicPaymentProperty;
 
+        /** @var PaymentProperty $paymentProperty */
+        $senderNamePaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $senderNamePaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_NAME_OF_SENDER;
+        $senderNamePaymentProperty->value = $contactBank->accountOwner;
+        $paymentProperties[] = $senderNamePaymentProperty;
+
+        /** @var PaymentProperty $paymentProperty */
+        $bankPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $bankPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BANK_NAME_OF_SENDER;
+        $bankPaymentProperty->value = $contactBank->bankName;
+        $paymentProperties[] = $bankPaymentProperty;
+
         $payment->properties     = $paymentProperties;
 
         /** @var PaymentRepositoryContract $paymentRepo */
@@ -198,7 +210,7 @@ class DebitHelper
             'orderId'       => $orderId,
             'accountOwner'  => $contactBank->accountOwner,
             'iban'          => $contactBank->iban,
-            'bic'          => $contactBank->bic,
+            'bic'           => $contactBank->bic,
             'lastUpdateBy'  => 'customer'
         ];
 
