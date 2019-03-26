@@ -19,7 +19,7 @@
                 <div class="col-xs-12">
                     <div class="input-unit">
                         <label :for="bankAccountOwner">{{ trans("Debit::PaymentMethod.bankAccountOwner") }} *</label>
-                        <input type="text" name="bankAccountOwner" value={{ bankAccountOwner }} required>
+                        <input type="text" name="bankAccountOwner" value="{{ bankAccountOwner }}" required>
                     </div>
                 </div>
 
@@ -27,7 +27,7 @@
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankName">{{ trans("Debit::PaymentMethod.bankName") }} *</label>
-                            <input type="text" name="bankName" value={{ bankName }} required>
+                            <input type="text" name="bankName" value="{{ bankName }}" required>
                         </div>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankIban">{{ trans("Debit::PaymentMethod.bankIban") }} *</label>
-                            <input type="text" name="bankIban" value={{ bankIban }} required>
+                            <input type="text" name="bankIban" value="{{ bankIban }}" required>
                         </div>
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankBic">{{ trans("Debit::PaymentMethod.bankBic") }} *</label>
-                            <input type="text" name="bankBic" value={{ bankBic }} required>
+                            <input type="text" name="bankBic" value="{{ bankBic }}" required>
                         </div>
                     </div>
                 </div>

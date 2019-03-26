@@ -104,24 +104,28 @@ class DebitController extends Controller
         try
         {
             //check if this contactBank already exist
-            /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
-            $authHelper = pluginApp(AuthHelper::class);
+            $contactBankExists = false;
+            if ($bankData['contactId'] != NULL) {
+                /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+                $authHelper = pluginApp(AuthHelper::class);
 
-            /** @var ContactPaymentRepositoryContract $paymentRepo */
-            $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
-            $contactBankExists = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-                $contactBanks = $paymentRepo->getBanksOfContact($bankData['contactId'], ['contactId', 'accountOwner', 'bankName', 'iban', 'bic']);
-                foreach ($contactBanks as $contactBank) {
-                    if ($contactBank->contactId == $bankData['contactId']
-                        && $contactBank->accountOwner == $bankData['accountOwner']
-                        && $contactBank->bankName == $bankData['bankName']
-                        && $contactBank->iban == $bankData['iban']
-                        && $contactBank->bic == $bankData['bic']) {
-                        return true;
+                /** @var ContactPaymentRepositoryContract $paymentRepo */
+                $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
+                $contactBankExists = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
+                    $contactBanks = $paymentRepo->getBanksOfContact($bankData['contactId'], ['contactId', 'accountOwner', 'bankName', 'iban', 'bic']);
+                    foreach ($contactBanks as $contactBank) {
+                        if ($contactBank->contactId == $bankData['contactId']
+                            && $contactBank->accountOwner == $bankData['accountOwner']
+                            && $contactBank->bankName == $bankData['bankName']
+                            && $contactBank->iban == $bankData['iban']
+                            && $contactBank->bic == $bankData['bic']
+                        ) {
+                            return true;
+                        }
                     }
-                }
-                return false;
-            });
+                    return false;
+                });
+            }
 
             $bankData['lastUpdateBy'] = 'customer';
             if (!$contactBankExists) {
