@@ -4,6 +4,7 @@ namespace Debit\Wizards;
 
 use Debit\Wizards\SettingsHandlers\DebitWizardSettingsHandler;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
+use Plenty\Modules\System\Contracts\SystemInformationRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Services\WizardProvider;
@@ -26,6 +27,15 @@ class DebitWizard extends WizardProvider
      */
     private $webstoreRepository;
 
+    /**
+     * @var array
+     */
+    private $deliveryCountries;
+
+    /**
+     * @var string
+     */
+    private $language;
 
     /**
      * @var Translator
@@ -98,7 +108,7 @@ class DebitWizard extends WizardProvider
                                 "info_page_type" => [
                                     'type' => 'select',
                                     'options' => [
-                                        "required" => true,
+                                        "required" => false,
                                         'name' => 'debitWizard.inputInfoPageTypeName',
                                         'listBoxValues' => [
                                             [
@@ -116,7 +126,7 @@ class DebitWizard extends WizardProvider
                                     'type' => 'number',
                                     'isVisible' => "info_page_type === 'internal'",
                                     'options' => [
-                                        'required'=> "info_page_type === 'internal'",
+                                        'required'=> false,
                                         'name' => 'debitWizard.inputInfoPageNameInternal',
                                     ],
                                 ],
@@ -124,7 +134,7 @@ class DebitWizard extends WizardProvider
                                     'type' => 'text',
                                     'isVisible' => "info_page_type === 'external'",
                                     'options' => [
-                                        'required'=> "info_page_type === 'external'",
+                                        'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
                                         'name' => 'debitWizard.inputInfoPageNameExternal',
                                     ],
@@ -137,20 +147,16 @@ class DebitWizard extends WizardProvider
                                 "logo_type" => [
                                     'type' => 'select',
                                     'options' => [
-                                        "required" => true,
+                                        "required" => false,
                                         'name' => 'debitWizard.inputLogoTypeName',
                                         'listBoxValues' => [
                                             [
-                                                "caption" => '',
-                                                "value" => '',
+                                                "caption" => 'debitWizard.logoDefault',
+                                                "value" => 'default',
                                             ],
                                             [
                                                 "caption" => 'debitWizard.logoURL',
                                                 "value" => 'url',
-                                            ],
-                                            [
-                                                "caption" => 'debitWizard.logoDefault',
-                                                "value" => 'default',
                                             ],
                                         ],
                                     ],
@@ -165,8 +171,21 @@ class DebitWizard extends WizardProvider
                                     ],
                                 ],
                             ],
+                        ],
+                        [
+                            "title" => 'debitWizard.sectionPaymentMethodIconTitle',
+                            "form" => [
+                                "debitPaymentMethodIcon" => [
+                                    'type' => 'toggle',
+                                    'defaultValue' => false,
+                                    'options' => [
+                                        'name' => '',
+                                        'required' => true,
+                                    ]
+                                ],
+                            ],
                         ]
-                    ],
+                    ]
                 ]
             ]
         ];
@@ -178,22 +197,25 @@ class DebitWizard extends WizardProvider
      */
     private function getCountriesListForm()
     {
-        $systemLanguage = 'de';//config('app.locale');
-
-        $countries = $this->countryRepository->getCountriesList(true, ['names']);
-        foreach ($countries as $country) {
-            $name = $country->names->where('lang', '=', $systemLanguage)->first()->name;
-            $values[] = [
-                "caption" => $name ?? $country->name,
-                "value" => $country->id,
-            ];
+        if ($this->deliveryCountries === null) {
+            /** @var CountryRepositoryContract $countryRepository */
+            $countryRepository = pluginApp(CountryRepositoryContract::class);
+            $countries = $countryRepository->getCountriesList(true, ['names']);
+            $this->deliveryCountries = [];
+            $systemLanguage = $this->getLanguage();
+            foreach($countries as $country) {
+                $name = $country->names->where('lang', $systemLanguage)->first()->name;
+                $this->deliveryCountries[] = [
+                    'caption' => $name ?? $country->name,
+                    'value' => $country->id
+                ];
+            }
+            // Sort values alphabetically
+            usort($this->deliveryCountries, function($a, $b) {
+                return ($a['caption'] <=> $b['caption']);
+            });
         }
-
-        usort($values, function ($a, $b) {
-            return ($a['caption'] <=> $b['caption']);
-        });
-
-        return $values;
+        return $this->deliveryCountries;
     }
 
     /**
@@ -215,5 +237,19 @@ class DebitWizard extends WizardProvider
         });
 
         return $values;
+    }
+
+    /**
+     * @return string
+     */
+    private function getLanguage()
+    {
+        if ($this->language === null) {
+            /** @var SystemInformationRepositoryContract $systemInformationRepository */
+            $systemInformationRepository = pluginApp(SystemInformationRepositoryContract::class);
+            $this->language = $systemInformationRepository->loadValue('systemLang');
+        }
+
+        return $this->language;
     }
 }

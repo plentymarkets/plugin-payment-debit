@@ -57,15 +57,17 @@ class DebitController extends Controller
                 $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                 $bankAccount['bankName']         =	$bank->bankName;
                 $bankAccount['bankIban']	     =	$bank->iban;
-                $bankAccount['bankBic']		 =	$bank->bic;
+                $bankAccount['bankBic']		     =	$bank->bic;
                 $bankAccount['bankId']		     =	0;
+                $bankAccount['sepaCheck']	     =	0;
             }
         } else {
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
             $bankAccount['bankName']         =	$contactBank->bankName;
             $bankAccount['bankIban']	     =	$contactBank->iban;
-            $bankAccount['bankBic']		 =	$contactBank->bic;
+            $bankAccount['bankBic']		     =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
+            $bankAccount['sepaCheck']	     =	$contactBank->directDebitMandateAvailable;
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
@@ -73,8 +75,9 @@ class DebitController extends Controller
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
             "bankName"          => $bankAccount['bankName'],
             "bankIban"          => $bankAccount['bankIban'],
-            "bankBic"         => $bankAccount['bankBic'],
+            "bankBic"           => $bankAccount['bankBic'],
             "bankId"            => $bankAccount['bankId'],
+            "sepaCheck"         => $bankAccount['sepaCheck'],
             "orderId"           => $orderId,
         ]);
     }
@@ -100,6 +103,34 @@ class DebitController extends Controller
 
         try
         {
+            //check if this contactBank already exist
+            /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+            $authHelper = pluginApp(AuthHelper::class);
+
+            /** @var ContactPaymentRepositoryContract $paymentRepo */
+            $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
+            $contactBankExists = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
+                $contactBanks = $paymentRepo->getBanksOfContact($bankData['contactId'], ['contactId', 'accountOwner', 'bankName', 'iban', 'bic']);
+                foreach ($contactBanks as $contactBank) {
+                    if ($contactBank->contactId == $bankData['contactId']
+                        && $contactBank->accountOwner == $bankData['accountOwner']
+                        && $contactBank->bankName == $bankData['bankName']
+                        && $contactBank->iban == $bankData['iban']
+                        && $contactBank->bic == $bankData['bic']) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            $bankData['lastUpdateBy'] = 'customer';
+            if (!$contactBankExists) {
+                $this->createContactBank($bankData);
+            }
+            $bankData['contactId'] = null;
+            $bankData['directDebitMandateAvailable'] = 1;
+            $bankData['directDebitMandateAt'] = date('Y-m-d H:i:s');
+            $bankData['paymentMethod'] = 'onOff';
             $contactBank = $this->createContactBank($bankData);
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
@@ -119,7 +150,6 @@ class DebitController extends Controller
     public function updateBankDetails(Response $response)
     {
         $bankData = [
-            'contactId'     => $this->accountService->getAccountContactId(),
             'accountOwner'  => $_REQUEST['bankAccountOwner'],
             'bankName'      => $_REQUEST['bankName'],
             'iban'          => $_REQUEST['bankIban'],

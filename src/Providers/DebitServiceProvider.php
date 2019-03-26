@@ -57,7 +57,7 @@ class DebitServiceProvider extends ServiceProvider
         $twig->addExtension(DebitTwigServiceProvider::class);
 
         // Register the debit payment method in the payment method container
-        $payContainer->register('plenty::DEBIT', DebitPaymentMethod::class,
+        $payContainer->register('plentyDebit::DEBIT', DebitPaymentMethod::class,
             [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class ]
         );
 

@@ -153,7 +153,10 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function getName()
     {
-        return trans("Debit::PaymentMethod.paymentMethodName");
+        if (function_exists('trans')) {
+            //  return trans("Debit::PaymentMethod.paymentMethodName");
+        }
+        return "Lastschrift";
     }
 
     /**

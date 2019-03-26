@@ -49,12 +49,18 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-xs-12">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="sepaCheck" required>
+                        <label class="form-check-label" for="sepaCheck">{{ trans("Debit::PaymentMethod.sepaAgreement") }} *</label>
+                      </div>
+                </div>
             </div>
 
             <div class="modal-footer">
-            	<button type="submit" class="btn btn-block" :class="buttonClasses">
-                	<i v-waiting-animation="isDisabled" class="fa fa-arrow-right" aria-hidden="true"></i>
-                   	{{ trans("Debit::PaymentMethod.bankAccountButtonLabel") }}
+            	<button type="submit" class="btn btn-primary" :class="buttonClasses">
+                	{{ trans("Debit::PaymentMethod.bankAccountButtonLabel") }}
             	</button>
             </div>
     </form>

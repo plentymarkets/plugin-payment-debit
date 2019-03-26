@@ -5,6 +5,8 @@ use Debit\Services\SettingsService;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
+use Plenty\Modules\Plugin\Contracts\PluginLayoutContainerRepositoryContract;
+use Plenty\Modules\Plugin\Models\Plugin;
 
 /**
  * Class TestWizardDataValidator
@@ -18,6 +20,15 @@ class DebitWizardSettingsHandler implements WizardSettingsHandler
     private $webstore;
 
     /**
+     * @var Plugin
+     */
+    private $debitPlugin;
+    /**
+     * @var Plugin
+     */
+    private $ceresPlugin;
+
+    /**
      * @param array $parameter
      * @return bool
      */
@@ -28,8 +39,7 @@ class DebitWizardSettingsHandler implements WizardSettingsHandler
 
         $this->saveDebitSettings($webstoreId, $data);
         $this->saveDebitShippingCountrySettings($webstoreId, $data);
-
-        //TODO Create container
+        $this->createContainer($webstoreId, $data);
 
         return true;
     }
@@ -89,4 +99,108 @@ class DebitWizardSettingsHandler implements WizardSettingsHandler
         return $this->webstore;
     }
 
+    /**
+     * @param int $webstoreId
+     * @param array $data
+     */
+    private function createContainer($webstoreId, $data)
+    {
+        $webstore = $this->getWebstore($webstoreId);
+
+        /** @var PluginLayoutContainerRepositoryContract $pluginLayoutContainerRepo */
+        $pluginLayoutContainerRepo = pluginApp(PluginLayoutContainerRepositoryContract::class);
+
+        $containerListEntries = [];
+
+        // Default entries
+        $containerListEntries[] = $this->createContainerDataListEntry(
+            $webstoreId,
+            'Ceres::Script.AfterScriptsLoaded',
+            'Debit\Providers\DataProvider\DebitReinitializePaymentScript'
+        );
+
+        $containerListEntries[] = $this->createContainerDataListEntry(
+            $webstoreId,
+            'Ceres::MyAccount.OrderHistoryPaymentInformation',
+            'Debit\Providers\DataProvider\DebitReinitializePayment'
+        );
+
+        if (isset($data['debitPaymentMethodIcon']) && $data['debitPaymentMethodIcon']) {
+            $containerListEntries[] = $this->createContainerDataListEntry(
+                $webstoreId,
+                'Ceres::Homepage.PaymentMethods',
+                'Debit\Providers\Icon\IconProvider'
+            );
+        } else {
+            $debitPlugin = $this->getDebitPlugin($webstoreId);
+            $ceresPlugin = $this->getCeresPlugin($webstoreId);
+
+            $pluginLayoutContainerRepo->removeOne(
+                $webstore->pluginSetId,
+                'Ceres::Homepage.PaymentMethods',
+                'Debit\Providers\Icon\IconProvider',
+                $ceresPlugin->id,
+                $debitPlugin->id
+            );
+        }
+
+        $pluginLayoutContainerRepo->addNew($containerListEntries, $webstore->pluginSetId);
+    }
+
+    /**
+     * @param int $webstoreId
+     * @param string $containerKey
+     * @param string $dataProviderKey
+     * @return array
+     */
+    private function createContainerDataListEntry($webstoreId, $containerKey, $dataProviderKey)
+    {
+        $webstore = $this->getWebstore($webstoreId);
+        $debitPlugin = $this->getDebitPlugin($webstoreId);
+        $ceresPlugin = $this->getCeresPlugin($webstoreId);
+
+        $dataListEntry = [];
+
+        $dataListEntry['containerKey'] = $containerKey;
+        $dataListEntry['dataProviderKey'] = $dataProviderKey;
+        $dataListEntry['dataProviderPluginId'] = $debitPlugin->id;
+        $dataListEntry['containerPluginId'] = $ceresPlugin->id;
+        $dataListEntry['pluginSetId'] = $webstore->pluginSetId;
+        $dataListEntry['dataProviderPluginSetEntryId'] = $debitPlugin->pluginSetEntries[0]->id;
+        $dataListEntry['containerPluginSetEntryId'] = $ceresPlugin->pluginSetEntries[0]->id;
+
+        return $dataListEntry;
+    }
+
+    /**
+     * @param int $webstoreId
+     * @return Plugin
+     */
+    private function getCeresPlugin($webstoreId)
+    {
+        if ($this->ceresPlugin === null) {
+            $webstore = $this->getWebstore($webstoreId);
+            $pluginSet = $webstore->pluginSet;
+            $plugins = $pluginSet->plugins();
+            $this->ceresPlugin = $plugins->where('name', 'Ceres')->first();
+        }
+
+        return $this->ceresPlugin;
+    }
+
+    /**
+     * @param int $webstoreId
+     * @return Plugin
+     */
+    private function getDebitPlugin($webstoreId)
+    {
+        if ($this->debitPlugin === null) {
+            $webstore = $this->getWebstore($webstoreId);
+            $pluginSet = $webstore->pluginSet;
+            $plugins = $pluginSet->plugins();
+            $this->debitPlugin = $plugins->where('name', 'Debit')->first();
+        }
+
+        return $this->debitPlugin;
+    }
 }
