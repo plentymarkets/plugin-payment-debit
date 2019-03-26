@@ -211,6 +211,7 @@ class DebitHelper
             'accountOwner'  => $contactBank->accountOwner,
             'iban'          => $contactBank->iban,
             'bic'           => $contactBank->bic,
+            'bankName'      => $contactBank->bankName,
             'lastUpdateBy'  => 'customer'
         ];
 
