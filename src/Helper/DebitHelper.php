@@ -108,6 +108,20 @@ class DebitHelper
         $paymentProperty->value = $orderId;
         $paymentProperties[] = $paymentProperty;
 
+        $contactBank = $this->sessionStorageService->getSessionValue('contactBank');
+
+        /** @var PaymentProperty $paymentProperty */
+        $ibanPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $ibanPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_IBAN_OF_SENDER;
+        $ibanPaymentProperty->value = $contactBank->iban;
+        $paymentProperties[] = $ibanPaymentProperty;
+
+        /** @var PaymentProperty $paymentProperty */
+        $bicPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $bicPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BIC_OF_SENDER;
+        $bicPaymentProperty->value = $contactBank->bic;
+        $paymentProperties[] = $bicPaymentProperty;
+
         $payment->properties     = $paymentProperties;
 
         /** @var PaymentRepositoryContract $paymentRepo */
@@ -184,6 +198,7 @@ class DebitHelper
             'orderId'       => $orderId,
             'accountOwner'  => $contactBank->accountOwner,
             'iban'          => $contactBank->iban,
+            'bic'          => $contactBank->bic,
             'lastUpdateBy'  => 'customer'
         ];
 
