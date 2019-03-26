@@ -110,29 +110,35 @@ class DebitHelper
 
         $contactBank = $this->sessionStorageService->getSessionValue('contactBank');
 
-        /** @var PaymentProperty $paymentProperty */
+        /** @var PaymentProperty $ibanPaymentProperty */
         $ibanPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
         $ibanPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_IBAN_OF_SENDER;
         $ibanPaymentProperty->value = $contactBank->iban;
         $paymentProperties[] = $ibanPaymentProperty;
 
-        /** @var PaymentProperty $paymentProperty */
+        /** @var PaymentProperty $bicPaymentProperty */
         $bicPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
         $bicPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BIC_OF_SENDER;
         $bicPaymentProperty->value = $contactBank->bic;
         $paymentProperties[] = $bicPaymentProperty;
 
-        /** @var PaymentProperty $paymentProperty */
+        /** @var PaymentProperty $senderNamePaymentProperty */
         $senderNamePaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
         $senderNamePaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_NAME_OF_SENDER;
         $senderNamePaymentProperty->value = $contactBank->accountOwner;
         $paymentProperties[] = $senderNamePaymentProperty;
 
-        /** @var PaymentProperty $paymentProperty */
+        /** @var PaymentProperty $bankPaymentProperty */
         $bankPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
         $bankPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BANK_NAME_OF_SENDER;
         $bankPaymentProperty->value = $contactBank->bankName;
         $paymentProperties[] = $bankPaymentProperty;
+
+        /** @var PaymentProperty $bookingTextPaymentProperty */
+        $bookingTextPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $bookingTextPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BOOKING_TEXT;
+        $bookingTextPaymentProperty->value = 'ORDER '. $orderId. ' IBAN: '.$contactBank->iban.' SENDER: '.$contactBank->accountOwner;
+        $paymentProperties[] = $bookingTextPaymentProperty;
 
         $payment->properties     = $paymentProperties;
 
