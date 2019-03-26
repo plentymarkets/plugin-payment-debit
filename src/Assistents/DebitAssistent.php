@@ -8,6 +8,7 @@ use Plenty\Modules\System\Contracts\SystemInformationRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Services\WizardProvider;
+use Plenty\Plugin\Application;
 use Plenty\Plugin\Translation\Translator;
 
 /**
@@ -61,7 +62,7 @@ class DebitAssistent extends WizardProvider
     {
         $config = [
             "title" => 'debitAssistent.assistentTitle',
-            "iconPath" => "",
+            "iconPath" => $this->getIcon(),
             "settingsHandlerClass" => DebitAssistentSettingsHandler::class,
             "translationNamespace" => "Debit",
             "key" => "payment-debit-assistent",
@@ -251,5 +252,11 @@ class DebitAssistent extends WizardProvider
         }
 
         return $this->language;
+    }
+
+    private function getIcon()
+    {
+        $app = pluginApp(Application::class);
+        return $app->getUrlPath('debit').'/images/icon.png';
     }
 }
