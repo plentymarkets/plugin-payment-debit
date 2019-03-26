@@ -15,6 +15,7 @@ use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Plugin\Application;
 use Debit\Services\SettingsService;
+use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class DebitPaymentMethod
@@ -37,6 +38,9 @@ class DebitPaymentMethod extends PaymentMethodService
     /** @var DebitHelper */
     protected $debitHelper;
 
+    /** @var Translator */
+    protected $translator;
+
     /**
      * DebitPaymentMethod constructor.
      * @param BasketRepositoryContract   $basketRepo
@@ -44,18 +48,21 @@ class DebitPaymentMethod extends PaymentMethodService
      * @param Checkout                   $checkout
      * @param AccountService             $accountService
      * @param DebitHelper                $debitHelper
+     * @param Translator                 $translator
      */
     public function __construct(  BasketRepositoryContract    $basketRepo,
                                   SettingsService             $service,
                                   Checkout                    $checkout,
                                   AccountService              $accountService,
-                                  DebitHelper                 $debitHelper)
+                                  DebitHelper                 $debitHelper,
+                                  Translator                  $translator)
     {
         $this->basketRepo     = $basketRepo;
         $this->settings       = $service;
         $this->checkout       = $checkout;
         $this->accountService = $accountService;
         $this->debitHelper    = $debitHelper;
+        $this->translator     = $translator;
     }
 
     /**
@@ -153,10 +160,7 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function getName()
     {
-        if (function_exists('trans')) {
-            //  return trans("Debit::PaymentMethod.paymentMethodName");
-        }
-        return "Lastschrift";
+        return $this->translator->trans("Debit::PaymentMethod.paymentMethodName");
     }
 
     /**

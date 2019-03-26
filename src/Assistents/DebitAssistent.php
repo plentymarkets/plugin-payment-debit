@@ -1,8 +1,8 @@
 <?php
 
-namespace Debit\Wizards;
+namespace Debit\Assistents;
 
-use Debit\Wizards\SettingsHandlers\DebitWizardSettingsHandler;
+use Debit\Assistents\SettingsHandlers\DebitAssistentSettingsHandler;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
 use Plenty\Modules\System\Contracts\SystemInformationRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
@@ -11,11 +11,11 @@ use Plenty\Modules\Wizard\Services\WizardProvider;
 use Plenty\Plugin\Translation\Translator;
 
 /**
- * Class DebitWizard
- * @package  Debit\Wizards
+ * Class DebitAssistent
+ * @package  Debit\Assistents
  * @author   Daniel Marx
  */
-class DebitWizard extends WizardProvider
+class DebitAssistent extends WizardProvider
 {
     /**
      * @var CountryRepositoryContract
@@ -53,18 +53,18 @@ class DebitWizard extends WizardProvider
     }
 
     /**
-     * The wizard structure
+     * The Assistent structure
      *
      * @return array
      */
     protected function structure()
     {
         $config = [
-            "title" => 'debitWizard.wizardTitle',
+            "title" => 'debitAssistent.assistentTitle',
             "iconPath" => "",
-            "settingsHandlerClass" => DebitWizardSettingsHandler::class,
+            "settingsHandlerClass" => DebitAssistentSettingsHandler::class,
             "translationNamespace" => "Debit",
-            "key" => "payment-debit-wizard",
+            "key" => "payment-debit-assistent",
             "topics" => [
                 "payment",
                 "debit",
@@ -73,24 +73,24 @@ class DebitWizard extends WizardProvider
                 "config_name" => [
                     "type" => 'select',
                     "options" => [
-                        "name" => 'debitWizard.storeName',
+                        "name" => 'debitAssistent.storeName',
                         'listBoxValues' => $this->getWebstoreListForm(),
                     ],
                 ],
             ],
             "steps" => [
                 "stepOne" => [
-                    "title" => 'debitWizard.stepOneTitle',
+                    "title" => 'debitAssistent.stepOneTitle',
                     "sections" => [
                         [
-                            "title" => 'debitWizard.shippingCountriesTitle',
+                            "title" => 'debitAssistent.shippingCountriesTitle',
                             "form" => [
                                 "countries" => [
                                     'type' => 'checkboxGroup',
                                     'defaultValue' => [],
                                     'options' => [
                                         "required" => true,
-                                        'name' => 'debitWizard.shippingCountries',
+                                        'name' => 'debitAssistent.shippingCountries',
                                         'checkboxValues' => $this->getCountriesListForm(),
                                     ],
                                 ],
@@ -100,23 +100,23 @@ class DebitWizard extends WizardProvider
                 ],
 
                 "stepTwo" => [
-                    "title" => 'debitWizard.stepTwoTitle',
+                    "title" => 'debitAssistent.stepTwoTitle',
                     "sections" => [
                         [
-                            "title" => 'debitWizard.sectionInfoPageTitle',
+                            "title" => 'debitAssistent.sectionInfoPageTitle',
                             "form" => [
                                 "info_page_type" => [
                                     'type' => 'select',
                                     'options' => [
                                         "required" => false,
-                                        'name' => 'debitWizard.inputInfoPageTypeName',
+                                        'name' => 'debitAssistent.inputInfoPageTypeName',
                                         'listBoxValues' => [
                                             [
-                                                "caption" => 'debitWizard.infoPageInternal',
+                                                "caption" => 'debitAssistent.infoPageInternal',
                                                 "value" => 'internal',
                                             ],
                                             [
-                                                "caption" => 'debitWizard.infoPageExternal',
+                                                "caption" => 'debitAssistent.infoPageExternal',
                                                 "value" => 'external',
                                             ],
                                         ],
@@ -127,7 +127,7 @@ class DebitWizard extends WizardProvider
                                     'isVisible' => "info_page_type === 'internal'",
                                     'options' => [
                                         'required'=> false,
-                                        'name' => 'debitWizard.inputInfoPageNameInternal',
+                                        'name' => 'debitAssistent.inputInfoPageNameInternal',
                                     ],
                                 ],
                                 "external_info_page" => [
@@ -136,26 +136,26 @@ class DebitWizard extends WizardProvider
                                     'options' => [
                                         'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
-                                        'name' => 'debitWizard.inputInfoPageNameExternal',
+                                        'name' => 'debitAssistent.inputInfoPageNameExternal',
                                     ],
                                 ],
                             ],
                         ],
                         [
-                            "title" => 'debitWizard.sectionLogoTitle',
+                            "title" => 'debitAssistent.sectionLogoTitle',
                             "form" => [
                                 "logo_type" => [
                                     'type' => 'select',
                                     'options' => [
                                         "required" => false,
-                                        'name' => 'debitWizard.inputLogoTypeName',
+                                        'name' => 'debitAssistent.inputLogoTypeName',
                                         'listBoxValues' => [
                                             [
-                                                "caption" => 'debitWizard.logoDefault',
+                                                "caption" => 'debitAssistent.logoDefault',
                                                 "value" => 'default',
                                             ],
                                             [
-                                                "caption" => 'debitWizard.logoURL',
+                                                "caption" => 'debitAssistent.logoURL',
                                                 "value" => 'url',
                                             ],
                                         ],
@@ -167,13 +167,13 @@ class DebitWizard extends WizardProvider
                                     'options' => [
                                         'required' => "logo_type === 'url'",
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
-                                        'name' => 'debitWizard.inputLogoTypeName',
+                                        'name' => 'debitAssistent.inputLogoTypeName',
                                     ],
                                 ],
                             ],
                         ],
                         [
-                            "title" => 'debitWizard.sectionPaymentMethodIconTitle',
+                            "title" => 'debitAssistent.sectionPaymentMethodIconTitle',
                             "form" => [
                                 "debitPaymentMethodIcon" => [
                                     'type' => 'toggle',

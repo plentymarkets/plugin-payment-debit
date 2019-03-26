@@ -2,7 +2,7 @@
 
 namespace Debit\Providers;
 
-use Debit\Wizards\DebitWizard;
+use Debit\Assistents\DebitAssistent;
 use Debit\Extensions\DebitTwigServiceProvider;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\ContactBank;
@@ -61,7 +61,7 @@ class DebitServiceProvider extends ServiceProvider
             [ AfterBasketChanged::class, AfterBasketItemAdd::class, AfterBasketCreate::class ]
         );
 
-        $wizardContainerContract->register('payment-debit-wizard', DebitWizard::class);
+        $wizardContainerContract->register('payment-debit-assistent', DebitAssistent::class);
 
         // Listen for the event that gets the payment method content
         $eventDispatcher->listen(GetPaymentMethodContent::class,

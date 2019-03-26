@@ -1,6 +1,6 @@
 <?php
 
-namespace Debit\Wizards\SettingsHandlers;
+namespace Debit\Assistents\SettingsHandlers;
 use Debit\Services\SettingsService;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
@@ -8,11 +8,8 @@ use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
 use Plenty\Modules\Plugin\Contracts\PluginLayoutContainerRepositoryContract;
 use Plenty\Modules\Plugin\Models\Plugin;
 
-/**
- * Class TestWizardDataValidator
- * @package Plenty\Modules\Wizard\Validators
- */
-class DebitWizardSettingsHandler implements WizardSettingsHandler
+
+class DebitAssistentSettingsHandler implements WizardSettingsHandler
 {
     /**
      * @var Webstore
