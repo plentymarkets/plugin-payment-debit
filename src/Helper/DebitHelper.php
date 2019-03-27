@@ -89,9 +89,10 @@ class DebitHelper
      * Create a payment in plentymarkets
      *
      * @param int $orderId
+     * @param ContactBank $contactBank
      * @return Payment
      */
-    public function createPlentyPayment($orderId)
+    public function createPlentyPayment($orderId, $contactBank)
     {
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
@@ -102,45 +103,14 @@ class DebitHelper
         $payment->unaccountable     = 1;
         $payment->regenerateHash    = true;
 
-        /** @var PaymentProperty $paymentProperty */
-        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $paymentProperty->typeId = 1;
-        $paymentProperty->value = $orderId;
-        $paymentProperties[] = $paymentProperty;
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $orderId);
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_IBAN_OF_SENDER, $contactBank->iban);
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_BIC_OF_SENDER, $contactBank->bic);
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_NAME_OF_SENDER, $contactBank->accountOwner);
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_BANK_NAME_OF_SENDER, $contactBank->bankName);
+        $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_BOOKING_TEXT, 'ORDER '. $orderId. ' IBAN: '.$contactBank->iban.' SENDER: '.$contactBank->accountOwner);
 
-        $contactBank = $this->sessionStorageService->getSessionValue('contactBank');
-
-        /** @var PaymentProperty $ibanPaymentProperty */
-        $ibanPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $ibanPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_IBAN_OF_SENDER;
-        $ibanPaymentProperty->value = $contactBank->iban;
-        $paymentProperties[] = $ibanPaymentProperty;
-
-        /** @var PaymentProperty $bicPaymentProperty */
-        $bicPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $bicPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BIC_OF_SENDER;
-        $bicPaymentProperty->value = $contactBank->bic;
-        $paymentProperties[] = $bicPaymentProperty;
-
-        /** @var PaymentProperty $senderNamePaymentProperty */
-        $senderNamePaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $senderNamePaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_NAME_OF_SENDER;
-        $senderNamePaymentProperty->value = $contactBank->accountOwner;
-        $paymentProperties[] = $senderNamePaymentProperty;
-
-        /** @var PaymentProperty $bankPaymentProperty */
-        $bankPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $bankPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BANK_NAME_OF_SENDER;
-        $bankPaymentProperty->value = $contactBank->bankName;
-        $paymentProperties[] = $bankPaymentProperty;
-
-        /** @var PaymentProperty $bookingTextPaymentProperty */
-        $bookingTextPaymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
-        $bookingTextPaymentProperty->typeId = \Plenty\Modules\Payment\Models\PaymentProperty::TYPE_BOOKING_TEXT;
-        $bookingTextPaymentProperty->value = 'ORDER '. $orderId. ' IBAN: '.$contactBank->iban.' SENDER: '.$contactBank->accountOwner;
-        $paymentProperties[] = $bookingTextPaymentProperty;
-
-        $payment->properties     = $paymentProperties;
+        $payment->properties = $paymentProperties;
 
         /** @var PaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(PaymentRepositoryContract::class);
@@ -185,25 +155,10 @@ class DebitHelper
     }
 
     /**
-     * @param int $contactBankId
-     */
-    public function setContactBank($contactBankId)
-    {
-        $this->sessionStorageService->setSessionValue('contactBankId', $contactBankId);
-    }
-
-    /**
-     * @return ContactBank $contactBank
-     */
-    public function getContactBank()
-    {
-        return $this->contactBank;
-    }
-
-    /**
      * Set orderId for ContactBank
      *
      * @param int $orderId
+     * @return ContactBank $contactBank
      */
     public function updateContactBank($orderId)
     {
@@ -224,8 +179,29 @@ class DebitHelper
         /** @var ContactPaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
 
-        $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
+
+        $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
             return $paymentRepo->updateContactBank($bankData, $bankData['id']);
         });
+
+        return $contactBank;
+    }
+
+
+    /*
+     * Create a PaymentProperty
+     *
+     * @param int    $typeId
+     * @param string $value
+     *
+     * @return PaymentProperty $paymentProperty
+     */
+    private function createPaymentProperty($typeId, $value)
+    {
+        /** @var PaymentProperty $paymentProperty */
+        $paymentProperty = pluginApp( \Plenty\Modules\Payment\Models\PaymentProperty::class );
+        $paymentProperty->typeId = $typeId;
+        $paymentProperty->value = $value;
+        return $paymentProperty;
     }
 }

@@ -59,7 +59,7 @@ class DebitController extends Controller
                 $bankAccount['bankIban']	     =	$bank->iban;
                 $bankAccount['bankBic']		     =	$bank->bic;
                 $bankAccount['bankId']		     =	0;
-                $bankAccount['sepaCheck']	     =	0;
+                $bankAccount['debitMandate']	     =	0;
             }
         } else {
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
@@ -67,7 +67,7 @@ class DebitController extends Controller
             $bankAccount['bankIban']	     =	$contactBank->iban;
             $bankAccount['bankBic']		     =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
-            $bankAccount['sepaCheck']	     =	$contactBank->directDebitMandateAvailable;
+            $bankAccount['debitMandate']	 =	$contactBank->directDebitMandateAvailable;
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
@@ -77,7 +77,7 @@ class DebitController extends Controller
             "bankIban"          => $bankAccount['bankIban'],
             "bankBic"           => $bankAccount['bankBic'],
             "bankId"            => $bankAccount['bankId'],
-            "sepaCheck"         => $bankAccount['sepaCheck'],
+            "debitMandate"      => $bankAccount['debitMandate'],
             "orderId"           => $orderId,
         ]);
     }
@@ -165,16 +165,16 @@ class DebitController extends Controller
         if (isset($_REQUEST['bankId']) && $_REQUEST['bankId'] > 0) {
             //update existing bankaccount
             $bankData['bankId'] = $_REQUEST['bankId'];
-            $this->updateContactBank($bankData);
+            $contactBank = $this->updateContactBank($bankData);
         } else {
             //create new bank account
-            $this->createContactBank($bankData);
+            $contactBank = $this->createContactBank($bankData);
         }
 
         /** @var DebitHelper $debitHelper */
         $debitHelper = pluginApp(DebitHelper::class);
         // Create a plentymarkets payment
-        $plentyPayment = $debitHelper->createPlentyPayment($_REQUEST['orderId']);
+        $plentyPayment = $debitHelper->createPlentyPayment($_REQUEST['orderId'], $contactBank);
 
         if($plentyPayment instanceof Payment) {
             // Assign the payment to an order in plentymarkets

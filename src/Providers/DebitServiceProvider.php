@@ -7,8 +7,6 @@ use Debit\Extensions\DebitTwigServiceProvider;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
-use Plenty\Modules\Frontend\Services\AccountService;
-use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Events\Checkout\ExecutePayment;
 use Plenty\Modules\Payment\Events\Checkout\GetPaymentMethodContent;
 use Plenty\Modules\Payment\Models\Payment;
@@ -81,8 +79,7 @@ class DebitServiceProvider extends ServiceProvider
                         $contact = $contactRepository->findContactById($basket->customerId);
 
                         $bank = $contact->banks->first();
-                        if($bank instanceof ContactBank)
-                        {
+                        if($bank instanceof ContactBank) {
                             $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                             $bankAccount['bankName']         =	$bank->bankName;
                             $bankAccount['bankIban']	     =	$bank->iban;
@@ -109,10 +106,10 @@ class DebitServiceProvider extends ServiceProvider
                 if($event->getMop() == $paymentHelper->getDebitMopId())
                 {
                     // Save orderId to ContactBank
-                    $paymentHelper->updateContactBank($event->getOrderId());
+                   $contactBank = $paymentHelper->updateContactBank($event->getOrderId());
 
                     // Create a plentymarkets payment
-                    $plentyPayment = $paymentHelper->createPlentyPayment($event->getOrderId());
+                    $plentyPayment = $paymentHelper->createPlentyPayment($event->getOrderId(), $contactBank);
 
                     if($plentyPayment instanceof Payment) {
                         // Assign the payment to an order in plentymarkets

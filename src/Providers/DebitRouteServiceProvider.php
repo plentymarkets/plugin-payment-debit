@@ -16,9 +16,6 @@ class DebitRouteServiceProvider extends RouteServiceProvider
        $apiRouter->version(['v1'], ['middleware' => ['oauth']],
             function ($routerApi)
             {
-                /** @var ApiRouter $routerApi*/
-                $routerApi->get('payment/debit/settings/{plentyId}', ['uses' => 'Debit\Controllers\SettingsController@loadSettings']);
-                $routerApi->put('payment/debit/settings', ['uses' => 'Debit\Controllers\SettingsController@saveSettings']);
             });
 
         $router->get('payment/debit/bankdetails/{orderId}', 'Debit\Controllers\DebitController@getBankDetails');
