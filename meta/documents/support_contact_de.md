@@ -1,0 +1,1 @@
+[Support Forum](https://forum.plentymarkets.com/c/payment/plugin-lastschrift)

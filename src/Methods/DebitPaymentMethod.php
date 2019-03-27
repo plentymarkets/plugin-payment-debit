@@ -111,24 +111,26 @@ class DebitPaymentMethod extends PaymentMethodService
         $session = pluginApp(FrontendSessionStorageFactoryContract::class);
         $lang = $session->getLocaleSettings()->language;
 
-        $infoPageType = $this->settings->getSetting('info_page_type');
+        if ($this->settings->getSetting('info_page_toggle')) {
+            $infoPageType = $this->settings->getSetting('info_page_type');
 
-        switch ($infoPageType)
-        {
-            case 'internal':
-                $categoryId = (int) $this->settings->getSetting('internal_info_page');
-                if($categoryId  > 0)
-                {
-                    /** @var CategoryRepositoryContract $categoryContract */
-                    $categoryContract = pluginApp(CategoryRepositoryContract::class);
-                    return $categoryContract->getUrl($categoryId, $lang);
-                }
-                return '';
-            case 'external':
-                return $this->settings->getSetting('external_info_page');
-            default:
-                return '';
+            switch ($infoPageType)
+            {
+                case 'internal':
+                    $categoryId = (int) $this->settings->getSetting('internal_info_page');
+                    if($categoryId  > 0)
+                    {
+                        /** @var CategoryRepositoryContract $categoryContract */
+                        $categoryContract = pluginApp(CategoryRepositoryContract::class);
+                        return $categoryContract->getUrl($categoryId, $lang);
+                    }
+                    return '';
+                case 'external':
+                    return $this->settings->getSetting('external_info_page');
+            }
         }
+
+        return '';
     }
 
     /**
@@ -168,9 +170,9 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @return string
      */
-    public function getDescription():string
+    public function getDescription()
     {
-        return $this->settings->getSetting('description');
+        return $this->translator->trans("Debit::PaymentMethod.paymentMethodDescription");
     }
 
     /**

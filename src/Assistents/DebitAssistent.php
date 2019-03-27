@@ -9,6 +9,7 @@ use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Services\WizardProvider;
 use Plenty\Plugin\Application;
+use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Translation\Translator;
 
 /**
@@ -106,6 +107,20 @@ class DebitAssistent extends WizardProvider
                         [
                             "title" => 'debitAssistent.sectionInfoPageTitle',
                             "form" => [
+                                "info_page_toggle" => [
+                                    'type' => 'toggle',
+                                    'defaultValue' => false,
+                                    'options' => [
+                                        'name' => '',
+                                        'required' => true,
+                                    ]
+                                ],
+                            ],
+                        ],
+                        [
+                            "title" => 'debitAssistent.inputInfoPageTypeButton',
+                            "condition" => 'info_page_toggle',
+                            "form" => [
                                 "info_page_type" => [
                                     'type' => 'select',
                                     'options' => [
@@ -125,7 +140,7 @@ class DebitAssistent extends WizardProvider
                                 ],
                                 "internal_info_page" => [
                                     'type' => 'number',
-                                    'isVisible' => "info_page_type === 'internal'",
+                                    'isVisible' => "info_page_toggle === true && info_page_type === 'internal'",
                                     'options' => [
                                         'required'=> false,
                                         'name' => 'debitAssistent.inputInfoPageNameInternal',
@@ -133,7 +148,7 @@ class DebitAssistent extends WizardProvider
                                 ],
                                 "external_info_page" => [
                                     'type' => 'text',
-                                    'isVisible' => "info_page_type === 'external'",
+                                    'isVisible' => "info_page_toggle === true && info_page_type === 'external'",
                                     'options' => [
                                         'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
@@ -168,7 +183,7 @@ class DebitAssistent extends WizardProvider
                                     'options' => [
                                         'required' => "logo_type === 'url'",
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
-                                        'name' => 'debitAssistent.inputLogoTypeName',
+                                        'name' => 'debitAssistent.inputLogoURLTypeName',
                                     ],
                                 ],
                             ],
@@ -184,6 +199,12 @@ class DebitAssistent extends WizardProvider
                                         'required' => true,
                                     ]
                                 ],
+                            ],
+                        ],
+                        [
+                            "title" => '',
+                            "description" => 'debitAssistent.additionalInformation',
+                            "form" => [
                             ],
                         ]
                     ]
@@ -246,9 +267,9 @@ class DebitAssistent extends WizardProvider
     private function getLanguage()
     {
         if ($this->language === null) {
-            /** @var SystemInformationRepositoryContract $systemInformationRepository */
-            $systemInformationRepository = pluginApp(SystemInformationRepositoryContract::class);
-            $this->language = $systemInformationRepository->loadValue('systemLang');
+            /** @var ConfigRepository $configRepository */
+            $configRepository = pluginApp(ConfigRepository::class);
+            $this->language =  $configRepository->get('app.locale');
         }
 
         return $this->language;
@@ -257,6 +278,11 @@ class DebitAssistent extends WizardProvider
     private function getIcon()
     {
         $app = pluginApp(Application::class);
+
+        if ($this->getLanguage() != 'de') {
+            return $app->getUrlPath('debit').'/images/icon_en.png';
+        }
+
         return $app->getUrlPath('debit').'/images/icon.png';
     }
 }

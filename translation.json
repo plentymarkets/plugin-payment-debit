@@ -2,6 +2,10 @@
   "sections":
   [
     {
+      "name": "MultilingualismConfig.paymentMethod",
+      "prefix": "paymentMethod"
+    },
+    {
       "name": "MultilingualismConfig.bankData",
       "prefix": "bank"
     },
