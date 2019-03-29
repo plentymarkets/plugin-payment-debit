@@ -4,18 +4,15 @@ namespace Debit\Assistents;
 
 use Debit\Assistents\SettingsHandlers\DebitAssistentSettingsHandler;
 use Plenty\Modules\Order\Shipping\Countries\Contracts\CountryRepositoryContract;
-use Plenty\Modules\System\Contracts\SystemInformationRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Services\WizardProvider;
 use Plenty\Plugin\Application;
-use Plenty\Plugin\ConfigRepository;
 use Plenty\Plugin\Translation\Translator;
 
 /**
  * Class DebitAssistent
  * @package  Debit\Assistents
- * @author   Daniel Marx
  */
 class DebitAssistent extends WizardProvider
 {
@@ -194,17 +191,15 @@ class DebitAssistent extends WizardProvider
                                 "debitPaymentMethodIcon" => [
                                     'type' => 'radioGroup',
                                     'defaultValue' => false,
-                                    "required" => true,
                                     'options' => [
                                         'radioValues' => [
                                             [
                                                 'caption'=>'debitAssistent.assistentNo',
-                                                'value'=>'false',
-                                                'defaultValue'=> true
+                                                'value'=>false,
                                             ],
                                             [
                                                 'caption'=>'debitAssistent.assistentYes',
-                                                'value'=>'true'
+                                                'value'=>true
                                             ]
                                         ],
                                     ],
