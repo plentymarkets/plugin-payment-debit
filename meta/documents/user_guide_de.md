@@ -26,7 +26,7 @@ Sie können Benennungen, die das Lastschrift-Plugin mitbringt im Menü **CMS » 
 3. Wählen Sie auf der rechten Seite die **Zielsprache** aus der Dropdown-Liste.
 4. Klappen Sie im Bereich **Debit** die Sektionen **Bankdaten**, **Reinitialisierung** und **Zahlungsart** aus.
 5. Geben Sie im Bereich der Zielsprache die gewünschten Texte für die einzelnen Sprachelemente ein.
-6. Speichern Sie die Einstellungen.
+6. **Speichern** Sie die Einstellungen.
 
  Weitere Informationen zum Bearbeiten von im Webshop angezeigten Texten finden Sie auf der Handbuchseite <strong><a href="https://knowledge.plentymarkets.com/webshop/ceres-einrichten#231" target="_blank">Ceres-Webshop einrichten</a></strong>.
 
