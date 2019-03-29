@@ -86,6 +86,16 @@ class DebitHelper
     }
 
     /**
+     * Return the ID for the old debit payment method
+     *
+     * @return int
+     */
+    public function getOldDebitMopId()
+    {
+        return 3;
+    }
+
+    /**
      * Create a payment in plentymarkets
      *
      * @param int $orderId

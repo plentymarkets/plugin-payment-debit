@@ -59,7 +59,7 @@ class DebitController extends Controller
                 $bankAccount['bankIban']	     =	$bank->iban;
                 $bankAccount['bankBic']		     =	$bank->bic;
                 $bankAccount['bankId']		     =	0;
-                $bankAccount['debitMandate']	     =	0;
+                $bankAccount['debitMandate']	 =	'';
             }
         } else {
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
@@ -67,7 +67,7 @@ class DebitController extends Controller
             $bankAccount['bankIban']	     =	$contactBank->iban;
             $bankAccount['bankBic']		     =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
-            $bankAccount['debitMandate']	 =	$contactBank->directDebitMandateAvailable;
+            $bankAccount['debitMandate']	 =	($contactBank->directDebitMandateAvailable ? 'checked' : '');
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
@@ -77,7 +77,7 @@ class DebitController extends Controller
             "bankIban"          => $bankAccount['bankIban'],
             "bankBic"           => $bankAccount['bankBic'],
             "bankId"            => $bankAccount['bankId'],
-            "debitMandate"      => $bankAccount['debitMandate'],
+            "debitMandate"      => ($bankAccount['debitMandate'] ? 'checked' : ''),
             "orderId"           => $orderId,
         ]);
     }

@@ -79,9 +79,10 @@ class DebitPaymentMethod extends PaymentMethodService
             $contactRepository = pluginApp(ContactRepositoryContract::class);
             $contact = $contactRepository->findContactById($basket->customerId);
             if(!is_null($contact) && $contact instanceof Contact) {
-                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
+                $allowed = $contact->allowedMethodsOfPayment->each(function($method) {
                     if($method instanceof ContactAllowedMethodOfPayment) {
-                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed) {
+                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
+                            || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
                             return true;
                         }
                     }
