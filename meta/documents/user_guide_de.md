@@ -28,9 +28,9 @@ Sie können Benennungen, die das Lastschrift-Plugin mitbringt im Menü **CMS » 
 5. Geben Sie im Bereich der Zielsprache die gewünschten Texte für die einzelnen Sprachelemente ein.
 6. Speichern Sie die Einstellungen.
 
- Weitere Informationen zum Bearbeiten von im Webshop angezeigten Texten finden Sie auf der Handbuchseite <strong><a href="https://knowledge.plentymarkets.com/webshop/ceres-einrichten#231" target="_blank">Ceres-Webshop einrichten</a></strong>
+ Weitere Informationen zum Bearbeiten von im Webshop angezeigten Texten finden Sie auf der Handbuchseite <strong><a href="https://knowledge.plentymarkets.com/webshop/ceres-einrichten#231" target="_blank">Ceres-Webshop einrichten</a></strong>.
 
 
 ## Lizenz
 
-Das gesamte Projekt unterliegt der GNU AFFERO GENERAL PUBLIC LICENSE – weitere Informationen finden Sie in der [LICENSE.md](https://github.com/plentymarkets/plugin-payment-invoice/blob/master/LICENSE.md).
+Das gesamte Projekt unterliegt der GNU AFFERO GENERAL PUBLIC LICENSE – weitere Informationen finden Sie in der [LICENSE.md](https://github.com/plentymarkets/plugin-payment-debit/blob/master/LICENSE.md).
