@@ -192,12 +192,22 @@ class DebitAssistent extends WizardProvider
                             "title" => 'debitAssistent.sectionPaymentMethodIconTitle',
                             "form" => [
                                 "debitPaymentMethodIcon" => [
-                                    'type' => 'toggle',
+                                    'type' => 'radioGroup',
                                     'defaultValue' => false,
+                                    "required" => true,
                                     'options' => [
-                                        'name' => '',
-                                        'required' => true,
-                                    ]
+                                        'radioValues' => [
+                                            [
+                                                'caption'=>'debitAssistent.assistentNo',
+                                                'value'=>'false',
+                                                'defaultValue'=> true
+                                            ],
+                                            [
+                                                'caption'=>'debitAssistent.assistentYes',
+                                                'value'=>'true'
+                                            ]
+                                        ],
+                                    ],
                                 ],
                             ],
                         ],
@@ -267,9 +277,7 @@ class DebitAssistent extends WizardProvider
     private function getLanguage()
     {
         if ($this->language === null) {
-            /** @var ConfigRepository $configRepository */
-            $configRepository = pluginApp(ConfigRepository::class);
-            $this->language =  $configRepository->get('app.locale');
+            $this->language =  \Locale::getDefault();
         }
 
         return $this->language;
