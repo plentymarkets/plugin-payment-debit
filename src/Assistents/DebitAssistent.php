@@ -260,7 +260,7 @@ class DebitAssistent extends WizardProvider
         }
 
         usort($values, function ($a, $b) {
-            return ($a['caption'] <=> $b['caption']);
+            return ($a['value'] <=> $b['value']);
         });
 
         return $values;
