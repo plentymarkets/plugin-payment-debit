@@ -152,7 +152,7 @@ class DebitPaymentMethod extends PaymentMethodService
         }
         elseif($this->settings->getSetting('logo_type') != 'default')
         {
-            return $this->settings->getSetting('logo_type');
+            return $this->settings->getSetting('logo_url');
         }
 
         return '';
