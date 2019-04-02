@@ -178,7 +178,7 @@ class DebitAssistent extends WizardProvider
                                     'type' => 'text',
                                     'isVisible' => "logo_type === 'url'",
                                     'options' => [
-                                        'required' => "logo_type === 'url'",
+                                        'required' => false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
                                         'name' => 'debitAssistent.inputLogoURLTypeName',
                                     ],
