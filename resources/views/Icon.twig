@@ -1,3 +1,8 @@
 {% set lang  = debit.sessionStorage.getLang() %}
 {% set name  = debit.settings.getSetting('name', lang) %}
-<img src="{{ plugin_path("Debit") }}/images/icon.png" title="{{ name }}">
+
+{% if (lang == 'de') %}
+	<img src="{{ plugin_path("Debit") }}/images/icon.png" title="{{ name }}">
+{% else  %}
+	<img src="{{ plugin_path("Debit") }}/images/icon_en.png" title="{{ name }}">
+{% endif %}

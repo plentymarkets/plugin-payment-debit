@@ -108,10 +108,6 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function getSourceUrl()
     {
-        /** @var FrontendSessionStorageFactoryContract $session */
-        $session = pluginApp(FrontendSessionStorageFactoryContract::class);
-        $lang = $session->getLocaleSettings()->language;
-
         if ($this->settings->getSetting('info_page_toggle')) {
             $infoPageType = $this->settings->getSetting('info_page_type');
 
@@ -123,7 +119,7 @@ class DebitPaymentMethod extends PaymentMethodService
                     {
                         /** @var CategoryRepositoryContract $categoryContract */
                         $categoryContract = pluginApp(CategoryRepositoryContract::class);
-                        return $categoryContract->getUrl($categoryId, $lang);
+                        return $categoryContract->getUrl($categoryId, $this->getLanguage());
                     }
                     return '';
                 case 'external':
@@ -143,8 +139,14 @@ class DebitPaymentMethod extends PaymentMethodService
     {
         if( $this->settings->getSetting('logo_type') == 'default')
         {
+            $lang = $this->getLanguage();
+
             $app = pluginApp(Application::class);
-            $icon = $app->getUrlPath('debit').'/images/icon.png';
+            if ($lang == 'de') {
+                $icon = $app->getUrlPath('debit').'/images/icon.png';
+            } else {
+                $icon = $app->getUrlPath('debit').'/images/icon_en.png';
+            }
 
             return $icon;
         }
@@ -194,5 +196,17 @@ class DebitPaymentMethod extends PaymentMethodService
     public function isSwitchableFrom()
     {
         return false;
+    }
+
+    /**
+     * Get the actual frontend language
+     *
+     * @return string
+     */
+    private function getLanguage()
+    {
+        /** @var FrontendSessionStorageFactoryContract $session */
+        $session = pluginApp(FrontendSessionStorageFactoryContract::class);
+        return $session->getLocaleSettings()->language;
     }
 }
