@@ -71,8 +71,10 @@ class DebitAssistent extends WizardProvider
             "options" => [
                 "config_name" => [
                     "type" => 'select',
+                    "defaultValue" => 0,
                     "options" => [
                         "name" => 'debitAssistent.storeName',
+                        'required' => true,
                         'listBoxValues' => $this->getWebstoreListForm(),
                     ],
                 ],
