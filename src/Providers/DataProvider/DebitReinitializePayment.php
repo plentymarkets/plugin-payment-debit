@@ -2,6 +2,7 @@
 
 namespace Debit\Providers\DataProvider;
 
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Plugin\Templates\Twig;
 use Debit\Helper\DebitHelper;
 
@@ -12,6 +13,18 @@ class DebitReinitializePayment
         /** @var DebitHelper $paymentHelper */
         $paymentHelper = pluginApp(DebitHelper::class);
         $paymentId = $paymentHelper->getDebitMopId();
-        return $twig->render('Debit::DebitReinitializePayment', ["order" => $arg[0], "paymentMethodId" => $paymentId]);
+
+        $order = $arg[0];
+
+        /** @var PaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
+        $orderPayments = $paymentRepo->getPaymentsByOrderId($order['id']);
+
+        $hasNoPayments = false;
+        if ($orderPayments == null) {
+            $hasNoPayments = true;
+        }
+
+        return $twig->render('Debit::DebitReinitializePayment', ["order" => $order, "paymentMethodId" => $paymentId, "paymentExists" => !$hasNoPayments]);
     }
 }
