@@ -1,50 +1,54 @@
-<script type="text/javascript">
+{% if (services.template.isCurrentTemplate('tpl.checkout') or services.template.isCurrentTemplate('tpl.my-account') or services.template.isCurrentTemplate('tpl.confirmation')) %}
 
-    $(function () {
-        if ($("#debitModal").data("modal-loaded") == true)
-        {
-            // Modal is already loaded
-        }
-        else
-        {
+    <script type="text/javascript">
 
-            $("body").append(" " +
+        $(function () {
+            if ($("#debitModal").data("modal-loaded") == true)
+            {
+                // Modal is already loaded
+            }
+            else
+            {
 
-                "<div class=\"modal fade in\" id=\"debitModal\" data-backdrop=\"static\"> " +
-                "<div class=\"modal-dialog\" role=\"dialog\">"+
-                "<div class=\"modal-content\">"+
+                $("body").append(" " +
 
-                "</div>" +
-                "</div>" +
-                "</div>");
+                    "<div class=\"modal fade in\" id=\"debitModal\" data-backdrop=\"static\"> " +
+                    "<div class=\"modal-dialog\" role=\"dialog\">"+
+                    "<div class=\"modal-content\">"+
 
-            $("#debitModal").data("modal-loaded", true);
-        }
+                    "</div>" +
+                    "</div>" +
+                    "</div>");
 
-    });
+                $("#debitModal").data("modal-loaded", true);
+            }
 
-    //Load the modal content
-    function loadDebitModal(orderId)
-    {
-        $("#debitModal .modal-content").html("Loading ...");
-
-        $.get("/payment/debit/bankdetails/" + orderId, function(data)
-        {
-            $('#debitModal .modal-content').html(data);
         });
-    }
+
+        //Load the modal content
+        function loadDebitModal(orderId)
+        {
+            $("#debitModal .modal-content").html("Loading ...");
+
+            $.get("/payment/debit/bankdetails/" + orderId, function(data)
+            {
+                $('#debitModal .modal-content').html(data);
+            });
+        }
 
 
-    document.addEventListener('historyPaymentMethodChanged', e => {
-        for (let property in e.detail.newOrder.order.properties) {
-            if (e.detail.newOrder.order.properties[property].typeId === 3) {
-                if (e.detail.newOrder.order.properties[property].value == {{ paymentMethodId }}) {
-                    document.getElementById("reinitDebit-" + e.detail.oldOrder.id).style.display = "block";
-                } else {
-                    document.getElementById("reinitDebit-" + e.detail.oldOrder.id).style.display = "none";
+        document.addEventListener('historyPaymentMethodChanged', e => {
+            for (let property in e.detail.newOrder.order.properties) {
+                if (e.detail.newOrder.order.properties[property].typeId === 3) {
+                    if (e.detail.newOrder.order.properties[property].value == {{ paymentMethodId }}) {
+                        document.getElementById("reinitDebit-" + e.detail.oldOrder.id).style.display = "block";
+                    } else {
+                        document.getElementById("reinitDebit-" + e.detail.oldOrder.id).style.display = "none";
+                    }
                 }
             }
-        }
-    });
+        });
 
-</script>
+    </script>
+
+{% endif %}
