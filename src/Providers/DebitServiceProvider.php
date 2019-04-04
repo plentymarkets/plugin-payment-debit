@@ -78,7 +78,7 @@ class DebitServiceProvider extends ServiceProvider
                         $contactRepository = pluginApp(ContactRepositoryContract::class);
                         $contact = $contactRepository->findContactById($basket->customerId);
 
-                        $bank = $contact->banks->first();
+                        $bank = $contact->banks->last();
                         if($bank instanceof ContactBank) {
                             $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                             $bankAccount['bankName']         =	$bank->bankName;
