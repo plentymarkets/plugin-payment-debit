@@ -156,13 +156,14 @@ class DebitController extends Controller
      */
     public function updateBankDetails(Response $response)
     {
+        $orderId = $_REQUEST['orderId'];
         $bankData = [
             'accountOwner'  => $_REQUEST['bankAccountOwner'],
             'bankName'      => $_REQUEST['bankName'],
             'iban'          => $_REQUEST['bankIban'],
             'bic'           => $_REQUEST['bankBic'],
             'lastUpdateBy'  => 'customer',
-            'orderId'       => $_REQUEST['orderId']
+            'orderId'       => $orderId
         ];
 
         if (isset($_REQUEST['bankId']) && $_REQUEST['bankId'] > 0) {
@@ -177,14 +178,14 @@ class DebitController extends Controller
         /** @var DebitHelper $debitHelper */
         $debitHelper = pluginApp(DebitHelper::class);
         // Create a plentymarkets payment
-        $plentyPayment = $debitHelper->createPlentyPayment($_REQUEST['orderId'], $contactBank);
+        $plentyPayment = $debitHelper->createPlentyPayment($orderId, $contactBank);
 
         if($plentyPayment instanceof Payment) {
             // Assign the payment to an order in plentymarkets
-            $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $_REQUEST['orderId']);
+            $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
         }
 
-        return $response->redirectTo('my-account');
+        return $response->redirectTo('confirmation/'.$orderId);
     }
 
     private function createContactBank($bankData) {
