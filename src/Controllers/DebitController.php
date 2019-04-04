@@ -45,21 +45,24 @@ class DebitController extends Controller
         });
 
         if (is_null($contactBank)) {
-            /** @var ContactRepositoryContract $contactRepository */
-            $contactRepository = pluginApp(ContactRepositoryContract::class);
-            $contact = $authHelper->processUnguarded(function () use ($contactRepository) {
-                return $contactRepository->findContactById($this->accountService->getAccountContactId());
-            });
+            $accountContactId = $this->accountService->getAccountContactId();
+            if($accountContactId>0) {
+                /** @var ContactRepositoryContract $contactRepository */
+                $contactRepository = pluginApp(ContactRepositoryContract::class);
+                $contact = $authHelper->processUnguarded(function () use ($contactRepository, $accountContactId) {
+                    return $contactRepository->findContactById($accountContactId);
+                });
 
-            $bank = $contact->banks->first();
-            if($bank instanceof ContactBank)
-            {
-                $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
-                $bankAccount['bankName']         =	$bank->bankName;
-                $bankAccount['bankIban']	     =	$bank->iban;
-                $bankAccount['bankBic']		     =	$bank->bic;
-                $bankAccount['bankId']		     =	0;
-                $bankAccount['debitMandate']	 =	'';
+                $bank = $contact->banks->last();
+                if($bank instanceof ContactBank)
+                {
+                    $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
+                    $bankAccount['bankName']         =	$bank->bankName;
+                    $bankAccount['bankIban']	     =	$bank->iban;
+                    $bankAccount['bankBic']		     =	$bank->bic;
+                    $bankAccount['bankId']		     =	0;
+                    $bankAccount['debitMandate']	 =	'';
+                }
             }
         } else {
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
@@ -71,7 +74,7 @@ class DebitController extends Controller
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
-            "action"            => "payment/debit/updateBankDetails",
+            "action"            => "/payment/debit/updateBankDetails",
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
             "bankName"          => $bankAccount['bankName'],
             "bankIban"          => $bankAccount['bankIban'],

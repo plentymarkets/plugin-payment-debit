@@ -11,13 +11,13 @@
         {% set paidStatus = property.value %}
     {% endif %}
 {% endfor %}
-{% if (paymentId == paymentMethodId) and (paidStatus != 'fullyPaid') %}
+{% if (paymentId == paymentMethodId) and (paidStatus != 'fullyPaid') and (order.status == 3) %}
     {% set display = "block" %}
 {% else %}
     {% set display = "none" %}
 {% endif %}
 
-{% if services.template.isCurrentTemplate('tpl.my-account') %}
+{% if services.template.isCurrentTemplate('tpl.my-account') or services.template.isCurrentTemplate('tpl.confirmation') %}
 
     <button id="reinitDebit-{{order.id}}" class="btn btn-primary btn-block" onClick="loadDebitModal({{order.id}})" data-toggle="modal" data-target="#debitModal" style="display: {{ display }}; margin-top: 0.5rem">
         {{ trans("Debit::PaymentMethod.reinitPaymentButton") }}
