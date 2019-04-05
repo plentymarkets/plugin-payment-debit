@@ -59,6 +59,15 @@
             </div>
 
             <div class="modal-footer">
+            	{% if checkout|trim is empty %}
+            		<button type="button" class="btn btn-secondary" :class="buttonClasses" data-dismiss="modal" aria-label="Close">
+            			{{ trans("Debit::PaymentMethod.bankAccountCancelButtonLabel") }}
+            		</button>
+            	{% else %}
+            		<button type="button" onClick="window.location.reload()" class="btn btn-secondary" :class="buttonClasses">
+            			{{ trans("Debit::PaymentMethod.bankAccountCancelButtonLabel") }}
+            		</button>
+            	{% endif %}
             	<button type="submit" class="btn btn-primary" :class="buttonClasses">
                 	{{ trans("Debit::PaymentMethod.bankAccountButtonLabel") }}
             	</button>
