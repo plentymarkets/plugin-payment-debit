@@ -137,7 +137,7 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     public function getIcon( )
     {
-        if( $this->settings->getSetting('logo_type') == 'default')
+        if(!$this->settings->getSetting('logo_type_external'))
         {
             $lang = $this->getLanguage();
 
@@ -150,12 +150,10 @@ class DebitPaymentMethod extends PaymentMethodService
 
             return $icon;
         }
-        elseif($this->settings->getSetting('logo_type') != 'default')
+        else
         {
             return $this->settings->getSetting('logo_url');
         }
-
-        return '';
     }
 
     /**

@@ -159,32 +159,35 @@ class DebitAssistent extends WizardProvider
                                 ],
                             ],
                         ],
+                    ],
+                ],
+
+                "stepThree" => [
+                    "title" => 'debitAssistent.stepTwoThree',
+                    "sections" => [
                         [
                             "title" => 'debitAssistent.sectionLogoTitle',
                             "description" => 'debitAssistent.sectionLogoDescription',
                             "form" => [
-                                "logo_type" => [
-                                    'type' => 'select',
+                                "logo_type_external" => [
+                                    'type' => 'toggle',
+                                    'defaultValue' => true,
                                     'options' => [
-                                        "required" => false,
-                                        'name' => 'debitAssistent.logoTypeName',
-                                        'listBoxValues' => [
-                                            [
-                                                "caption" => 'debitAssistent.logoDefault',
-                                                "value" => 'default',
-                                            ],
-                                            [
-                                                "caption" => 'debitAssistent.logoURL',
-                                                "value" => 'url',
-                                            ],
-                                        ],
+                                        'name' => '',
+                                        'required' => true,
                                     ],
                                 ],
+                            ],
+                        ],
+                        [
+                            "title" => '',
+                            "description" => 'debitAssistent.logoURLDescription',
+                            "condition" => 'logo_type_external',
+                            "form" => [
                                 "logo_url" => [
                                     'type' => 'text',
-                                    'isVisible' => "logo_type === 'url'",
                                     'options' => [
-                                        'required' => false,
+                                        'required' => true,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
                                         'name' => 'debitAssistent.logoURLTypeName',
                                     ],
@@ -213,12 +216,6 @@ class DebitAssistent extends WizardProvider
                                 ],
                             ],
                         ],
-                        [
-                            "title" => 'debitAssistent.additionalInformationTitle',
-                            "description" => 'debitAssistent.additionalInformationDescription',
-                            "form" => [
-                            ],
-                        ]
                     ]
                 ]
             ]

@@ -2,7 +2,7 @@
 {% set name  = debit.settings.getSetting('name') %}
 {% set icon  = "/images/icon.png" %}
 
-{% if (debit.settings.getSetting('logo_type') == 'default') %}
+{% if (debit.settings.getSetting('logo_type_external') != true) %}
 	{% if (lang != 'de') %}
 		{% set icon  = "/images/icon_en.png" %}
 	{% endif %}

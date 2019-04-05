@@ -51,7 +51,7 @@ class DebitAssistentSettingsHandler implements WizardSettingsHandler
 
         $settings = [
             'PID_' . $webstore->storeIdentifier => [
-                'logo_type' => $data['logo_type'],
+                'logo_type_external' => $data['logo_type_external'],
                 'logo_url'  => $data['logo_url'],
                 'info_page_toggle' => $data['info_page_toggle'],
                 'external_info_page'  => $data['external_info_page'],
