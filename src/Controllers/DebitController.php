@@ -74,7 +74,7 @@ class DebitController extends Controller
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
-            "action"            => "/payment/debit/updateBankDetails",
+            "action"            => "/rest/payment/debit/updateBankDetails",
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
             "bankName"          => $bankAccount['bankName'],
             "bankIban"          => $bankAccount['bankIban'],
@@ -142,11 +142,11 @@ class DebitController extends Controller
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
 
-            return $response->redirectTo('place-order');
+            return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/place-order');
         }
         catch(\Exception $e)
         {
-            return $response->redirectTo('checkout');
+            return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/checkout');
         }
     }
 
@@ -185,7 +185,7 @@ class DebitController extends Controller
             $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
         }
 
-        return $response->redirectTo('confirmation/'.$orderId);
+        return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/confirmation/'.$orderId);
     }
 
     private function createContactBank($bankData) {

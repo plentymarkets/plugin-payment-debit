@@ -89,7 +89,7 @@ class DebitServiceProvider extends ServiceProvider
 
                     $event->setValue($twig->render('Debit::BankDetailsOverlay', [
                         "checkout"          => "true",
-                        "action"            => "payment/debit/bankdetails",
+                        "action"            => "rest/payment/debit/bankdetails",
                         "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
                         "bankName"          => $bankAccount['bankName'],
                         "bankIban"          => $bankAccount['bankIban'],

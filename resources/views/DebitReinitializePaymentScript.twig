@@ -30,7 +30,7 @@
         {
             $("#debitModal .modal-content").html("Loading ...");
 
-            $.get("/payment/debit/bankdetails/" + orderId, function(data)
+            $.get("/rest/payment/debit/bankdetails/" + orderId, function(data)
             {
                 $('#debitModal .modal-content').html(data);
             });

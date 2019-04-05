@@ -18,9 +18,9 @@ class DebitRouteServiceProvider extends RouteServiceProvider
             {
             });
 
-        $router->get('payment/debit/bankdetails/{orderId}', 'Debit\Controllers\DebitController@getBankDetails');
-        $router->post('payment/debit/bankdetails', 'Debit\Controllers\DebitController@setBankDetails');
-        $router->post('payment/debit/updateBankDetails', 'Debit\Controllers\DebitController@updateBankDetails');
+        $router->get('rest/payment/debit/bankdetails/{orderId}', 'Debit\Controllers\DebitController@getBankDetails');
+        $router->post('rest/payment/debit/bankdetails', 'Debit\Controllers\DebitController@setBankDetails');
+        $router->post('rest/payment/debit/updateBankDetails', 'Debit\Controllers\DebitController@updateBankDetails');
     }
 
 }
