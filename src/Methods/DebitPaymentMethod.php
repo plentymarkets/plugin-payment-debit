@@ -93,6 +93,15 @@ class DebitPaymentMethod extends PaymentMethodService
             }
         }
 
+        /**
+         * Check whether the user is logged in
+         */
+        if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
+        {
+            return false;
+        }
+
+
         if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
         {
             return false;

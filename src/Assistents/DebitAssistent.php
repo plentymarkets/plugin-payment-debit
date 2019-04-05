@@ -98,6 +98,28 @@ class DebitAssistent extends WizardProvider
                                 ],
                             ],
                         ],
+                        [
+                            "title" => 'debitAssistent.allowDebitForGuestTitle',
+                            "description" => 'debitAssistent.allowDebitForGuestDescription',
+                            "form" => [
+                                "allowDebitForGuest" => [
+                                    'type' => 'radioGroup',
+                                    'defaultValue' => false,
+                                    'options' => [
+                                        'radioValues' => [
+                                            [
+                                                'caption'=>'debitAssistent.assistentNo',
+                                                'value'=>false,
+                                            ],
+                                            [
+                                                'caption'=>'debitAssistent.assistentYes',
+                                                'value'=>true
+                                            ]
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
                     ],
                 ],
 
@@ -171,7 +193,7 @@ class DebitAssistent extends WizardProvider
                             "form" => [
                                 "logo_type_external" => [
                                     'type' => 'toggle',
-                                    'defaultValue' => true,
+                                    'defaultValue' => false,
                                     'options' => [
                                         'name' => '',
                                         'required' => true,

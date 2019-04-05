@@ -56,7 +56,8 @@ class DebitAssistentSettingsHandler implements WizardSettingsHandler
                 'info_page_toggle' => $data['info_page_toggle'],
                 'external_info_page'  => $data['external_info_page'],
                 'internal_info_page' => $data['internal_info_page'],
-                'info_page_type' => $data['info_page_type']
+                'info_page_type' => $data['info_page_type'],
+                'allowDebitForGuest' => $data['allowDebitForGuest']
             ]
         ];
         /** @var SettingsService $settingsService */
