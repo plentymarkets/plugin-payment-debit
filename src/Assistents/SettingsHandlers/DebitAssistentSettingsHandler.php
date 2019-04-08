@@ -122,6 +122,12 @@ class DebitAssistentSettingsHandler implements WizardSettingsHandler
             'Debit\Providers\DataProvider\DebitReinitializePayment'
         );
 
+        $containerListEntries[] = $this->createContainerDataListEntry(
+            $webstoreId,
+            'Ceres::OrderConfirmation.AdditionalPaymentInformation',
+            'Debit\Providers\DataProvider\DebitReinitializePayment'
+        );
+
         if (isset($data['debitPaymentMethodIcon']) && $data['debitPaymentMethodIcon']) {
             $containerListEntries[] = $this->createContainerDataListEntry(
                 $webstoreId,
