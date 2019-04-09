@@ -1,6 +1,6 @@
 <?php
 
-namespace Debit\Assistents\SettingsHandlers;
+namespace Debit\Assistants\SettingsHandlers;
 use Debit\Services\SettingsService;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
@@ -9,7 +9,7 @@ use Plenty\Modules\Plugin\Contracts\PluginLayoutContainerRepositoryContract;
 use Plenty\Modules\Plugin\Models\Plugin;
 
 
-class DebitAssistentSettingsHandler implements WizardSettingsHandler
+class DebitAssistantSettingsHandler implements WizardSettingsHandler
 {
     /**
      * @var Webstore
