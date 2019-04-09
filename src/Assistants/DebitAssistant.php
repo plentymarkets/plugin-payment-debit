@@ -147,6 +147,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "info_page_type" => [
                                     'type' => 'select',
+                                    'defaultValue' => 'internal',
                                     'options' => [
                                         "required" => false,
                                         'name' => 'debitAssistant.infoPageTypeName',
@@ -164,7 +165,7 @@ class DebitAssistant extends WizardProvider
                                 ],
                                 "internal_info_page" => [
                                     'type' => 'number',
-                                    'isVisible' => "info_page_toggle === true && info_page_type === 'internal'",
+                                    'isVisible' => "info_page_toggle == true && info_page_type == 'internal'",
                                     'options' => [
                                         'required'=> false,
                                         'name' => 'debitAssistant.infoPageNameInternal',
@@ -172,7 +173,7 @@ class DebitAssistant extends WizardProvider
                                 ],
                                 "external_info_page" => [
                                     'type' => 'text',
-                                    'isVisible' => "info_page_toggle === true && info_page_type === 'external'",
+                                    'isVisible' => "info_page_toggle == true && info_page_type == 'external'",
                                     'options' => [
                                         'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
