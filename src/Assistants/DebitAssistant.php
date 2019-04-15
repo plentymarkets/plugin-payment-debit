@@ -103,20 +103,10 @@ class DebitAssistant extends WizardProvider
                             "description" => 'debitAssistant.allowDebitForGuestDescription',
                             "form" => [
                                 "allowDebitForGuest" => [
-                                    'type' => 'radioGroup',
-                                    'defaultValue' => false,
+                                    'type' => 'checkbox',
                                     'options' => [
-                                        'radioValues' => [
-                                            [
-                                                'caption'=>'debitAssistant.assistantNo',
-                                                'value'=>false,
-                                            ],
-                                            [
-                                                'caption'=>'debitAssistant.assistantYes',
-                                                'value'=>true
-                                            ]
-                                        ],
-                                    ],
+                                        'name' => 'debitAssistant.assistantYes'
+                                    ]
                                 ],
                             ],
                         ],
@@ -163,17 +153,27 @@ class DebitAssistant extends WizardProvider
                                         ],
                                     ],
                                 ],
+                            ],
+                        ],
+                        [
+                            "title" => '',
+                            "description" => 'debitAssistant.infoPageNameInternal',
+                            "condition" => 'info_page_toggle && info_page_type == "internal"',
+                            "form" => [
                                 "internal_info_page" => [
-                                    'type' => 'number',
+                                    "type" => 'category',
                                     'isVisible' => "info_page_toggle == true && info_page_type == 'internal'",
-                                    'options' => [
-                                        'required'=> false,
-                                        'name' => 'debitAssistant.infoPageNameInternal',
-                                    ],
+                                    "displaySearch" => true
                                 ],
+                            ],
+                        ],
+                        [
+                            "title" => '',
+                            "description" => '',
+                            "condition" => 'info_page_toggle && info_page_type == "external"',
+                            "form" => [
                                 "external_info_page" => [
                                     'type' => 'text',
-                                    'isVisible' => "info_page_toggle == true && info_page_type == 'external'",
                                     'options' => [
                                         'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
@@ -208,12 +208,8 @@ class DebitAssistant extends WizardProvider
                             "condition" => 'logo_type_external',
                             "form" => [
                                 "logo_url" => [
-                                    'type' => 'text',
-                                    'options' => [
-                                        'required' => true,
-                                        'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
-                                        'name' => 'debitAssistant.logoURLTypeName',
-                                    ],
+                                    'type' => 'file',
+                                    'showPreview' => true
                                 ],
                             ],
                         ],
@@ -222,20 +218,10 @@ class DebitAssistant extends WizardProvider
                             "description" => 'debitAssistant.sectionPaymentMethodIconDescription',
                             "form" => [
                                 "debitPaymentMethodIcon" => [
-                                    'type' => 'radioGroup',
-                                    'defaultValue' => false,
+                                    'type' => 'checkbox',
                                     'options' => [
-                                        'radioValues' => [
-                                            [
-                                                'caption'=>'debitAssistant.assistantNo',
-                                                'value'=>false,
-                                            ],
-                                            [
-                                                'caption'=>'debitAssistant.assistantYes',
-                                                'value'=>true
-                                            ]
-                                        ],
-                                    ],
+                                        'name' => 'debitAssistant.assistantYes'
+                                    ]
                                 ],
                             ],
                         ],
