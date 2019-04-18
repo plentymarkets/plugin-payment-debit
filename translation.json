@@ -1,0 +1,22 @@
+{
+  "sections":
+  [
+    {
+      "name": "MultilingualismConfig.paymentMethod",
+      "prefix": "paymentMethod"
+    },
+    {
+      "name": "MultilingualismConfig.bankData",
+      "prefix": "bank"
+    },
+    {
+      "name": "MultilingualismConfig.reinit",
+      "prefix": "reinit"
+    }
+  ],
+  "ignoredTranslationFiles":
+  [
+    "MultilingualismConfig.properties",
+    "debitAssistant.properties"
+  ]
+}

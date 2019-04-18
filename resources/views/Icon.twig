@@ -1,0 +1,14 @@
+{% set lang  = debit.sessionStorage.getLang() %}
+{% set name  = debit.settings.getSetting('name') %}
+{% set icon  = "/images/icon.png" %}
+
+{% if (debit.settings.getSetting('logo_type_external') != true) %}
+	{% if (lang != 'de') %}
+		{% set icon  = "/images/icon_en.png" %}
+	{% endif %}
+	<img src="{{ plugin_path("Debit") }}{{ icon }}" title="{{ name }}">
+{% else %}
+	{% set icon  = debit.settings.getSetting('logo_url') %}
+	<img src="{{ icon }}" title="{{ name }}">
+{% endif %}
+

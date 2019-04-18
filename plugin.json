@@ -1,4 +1,47 @@
-   {
-    "version"           : "1.0.0",
-    "name"              : "Debit"
+{
+  "version"           : "1.0.0",
+  "name"              : "Debit",
+  "marketplaceName"   : {"de":"Lastschrift","en":"Debit"},
+  "license"           : "AGPL-3.0",
+  "pluginIcon"        : "icon_plugin_xs.png",
+  "price"             : 0.00,
+  "description"       : "Debit plugin for plentymarkets online stores",
+  "shortDescription"  : {"de": "Zahlungsart Lastschrift für plentymarkets Webshops","en": "Payment method debit for plentymarkets online stores"},
+  "categories"        : ["3519"],
+  "author"            : "plentysystems AG",
+  "authorIcon"        : "icon_author_xs.png",
+  "email"             : "sales@plentymarkets.com",
+  "phone"             : "+49 561 98 681 100",
+  "keywords"          : [],
+  "type"              : "payment",
+  "namespace"         : "Debit",
+  "serviceProvider"   : "Debit\\Providers\\DebitServiceProvider",
+  "javaScriptFiles"   : [],
+  "containers"        : [],
+  "dataProviders"     :
+  [
+      {
+          "key"           :"Debit\\Providers\\Icon\\IconProvider",
+          "name"          :"Debit icon",
+          "description"   :"Display the icon for this payment method",
+          "defaultLayoutContainer": "Ceres::Homepage.PaymentMethods"
+      },
+      {
+          "key" :"Debit\\Providers\\DataProvider\\DebitReinitializePayment",
+          "name":"Debit Reinitialize Payment",
+          "description":"Display the Debit Button after the Payment changed to Debit",
+          "defaultLayoutContainer": "Ceres::MyAccount.OrderHistoryPaymentInformation"
+      },
+      {
+          "key":"Debit\\Providers\\DataProvider\\DebitReinitializePaymentScript",
+          "name":"Debit Reinitialize Payment Script",
+          "description":"A Script for displaying the Debit Button after the Payment changed to Debit",
+          "defaultLayoutContainer": "Ceres::Script.AfterScriptsLoaded"
+      }
+  ],
+  "dependencies"      : [],
+  "runOnBuild"        : [
+      "Debit\\Migrations\\CreateSettings_1_0_0",
+      "Debit\\Migrations\\CreateShippingCountrySettings_1_0"
+  ]
 }

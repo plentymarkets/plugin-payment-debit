@@ -1,0 +1,74 @@
+
+	<form :id="bankAccount-input-form" action={{ action }} method="post">
+		<input type="hidden" name="bankId" 	value={{ bankId }}>
+		<input type="hidden" name="orderId" value={{ orderId }}>
+			<div class="modal-header">
+				{% if checkout|trim is empty %}
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">x</span>
+					</button>
+				{% else %}
+					<button type="button" onClick="window.location.reload()" class="close">
+						<span aria-hidden="true">x</span>
+					</button>
+				{% endif %}
+				<h4 class="modal-title">{{ trans("Debit::PaymentMethod.bankDetails") }}</h4>
+			</div>
+
+            <div class="modal-body form-horizontal row">
+                <div class="col-xs-12">
+                    <div class="input-unit">
+                        <label :for="bankAccountOwner">{{ trans("Debit::PaymentMethod.bankAccountOwner") }} *</label>
+                        <input type="text" name="bankAccountOwner" value="{{ bankAccountOwner }}" required="required">
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit">
+                            <label :for="bankName">{{ trans("Debit::PaymentMethod.bankName") }}</label>
+                            <input type="text" name="bankName" value="{{ bankName }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit">
+                            <label :for="bankIban">{{ trans("Debit::PaymentMethod.bankIban") }} *</label>
+                            <input type="text" name="bankIban" value="{{ bankIban }}" required="required" pattern="[a-zA-Z]{2}[0-9]{2}[a-zA-Z0-9]{4}[0-9]{7}([a-zA-Z0-9]?){0,16}" maxlength="32" title="{{ trans('Debit::PaymentMethod.bankIban') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="input-group">
+                        <div class="input-unit">
+                            <label :for="bankBic">{{ trans("Debit::PaymentMethod.bankBic") }} *</label>
+                            <input type="text" name="bankBic" value="{{ bankBic }}" required="required" pattern="([a-zA-Z]{4}[a-zA-Z]{2}[a-zA-Z0-9]{2}([a-zA-Z0-9]{3})?)" title="{{ trans('Debit::PaymentMethod.bankBic') }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="form-check">
+                        <label class="form-check-label"><input type="checkbox" class="form-check-input" name="debitMandate" {{ debitMandate }} required="required">* {{ trans("Debit::PaymentMethod.paymentMethodDebitMandate") }}</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            	{% if checkout|trim is empty %}
+            		<button type="button" class="btn btn-secondary" :class="buttonClasses" data-dismiss="modal" aria-label="Close">
+            			{{ trans("Debit::PaymentMethod.bankAccountCancelButtonLabel") }}
+            		</button>
+            	{% else %}
+            		<button type="button" onClick="window.location.reload()" class="btn btn-secondary" :class="buttonClasses">
+            			{{ trans("Debit::PaymentMethod.bankAccountCancelButtonLabel") }}
+            		</button>
+            	{% endif %}
+            	<button type="submit" class="btn btn-primary" :class="buttonClasses">
+                	{{ trans("Debit::PaymentMethod.bankAccountButtonLabel") }}
+            	</button>
+            </div>
+    </form>
