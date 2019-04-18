@@ -162,6 +162,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "internal_info_page" => [
                                     "type" => 'category',
+                                    'defaultValue' => '',
                                     'isVisible' => "info_page_toggle == true && info_page_type == 'internal'",
                                     "displaySearch" => true
                                 ],
@@ -174,6 +175,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "external_info_page" => [
                                     'type' => 'text',
+                                    'defaultValue' => '',
                                     'options' => [
                                         'required'=> false,
                                         'pattern'=> "(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})",
@@ -209,6 +211,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "logo_url" => [
                                     'type' => 'file',
+                                    'defaultValue' => '',
                                     'showPreview' => true
                                 ],
                             ],
