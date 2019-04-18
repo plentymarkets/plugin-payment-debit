@@ -104,6 +104,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "allowDebitForGuest" => [
                                     'type' => 'checkbox',
+                                    'defaultValue' => 'false',
                                     'options' => [
                                         'name' => 'debitAssistant.assistantDebitForGuestCheckbox'
                                     ]
@@ -220,6 +221,7 @@ class DebitAssistant extends WizardProvider
                             "form" => [
                                 "debitPaymentMethodIcon" => [
                                     'type' => 'checkbox',
+                                    'defaultValue' => 'false',
                                     'options' => [
                                         'name' => 'debitAssistant.assistantPaymentMethodIconCheckbox'
                                     ]
