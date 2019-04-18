@@ -125,7 +125,6 @@ class DebitAssistant extends WizardProvider
                                     'defaultValue' => false,
                                     'options' => [
                                         'name' => '',
-                                        'required' => true,
                                     ]
                                 ],
                             ],
@@ -199,7 +198,6 @@ class DebitAssistant extends WizardProvider
                                     'defaultValue' => false,
                                     'options' => [
                                         'name' => '',
-                                        'required' => true,
                                     ],
                                 ],
                             ],
