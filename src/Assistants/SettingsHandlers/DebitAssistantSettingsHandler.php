@@ -32,7 +32,12 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
     public function handle(array $parameter)
     {
         $data = $parameter['data'];
-        $webstoreId = $parameter['optionId'];
+
+        if (!$this->isValidUUIDv4($parameter['optionId'])) {
+            $webstoreId = $parameter['optionId'];
+        } else {
+            $webstoreId = $data['config_name'];
+        }
 
         $this->saveDebitSettings($webstoreId, $data);
         $this->saveDebitShippingCountrySettings($webstoreId, $data);
@@ -205,5 +210,17 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
         }
 
         return $this->debitPlugin;
+    }
+
+    /**
+     * Check if a string is a valid UUID.
+     *
+     * @param string $string
+     * @return false|int
+     */
+    public static function isValidUUIDv4($string)
+    {
+        $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+        return preg_match($regex, $string);
     }
 }
