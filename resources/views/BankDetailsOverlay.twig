@@ -1,4 +1,9 @@
 
+<script type="text/javascript">
+    $("#bankAccount-input-form").submit(function(e) {
+        $(".btn-primary").attr("disabled",true);
+    });
+</script>
 	<form :id="bankAccount-input-form" action={{ action }} method="post">
 		<input type="hidden" name="bankId" 	value={{ bankId }}>
 		<input type="hidden" name="orderId" value={{ orderId }}>
