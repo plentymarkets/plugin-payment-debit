@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- A temporary issue in the checkout could result into an order being created twice.
+- A temporary issue in the checkout could result into an order being created twice. This error has been fixed.
 
 ## 1.0.1 (2019-05-08)
 
