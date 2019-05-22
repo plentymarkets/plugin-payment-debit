@@ -1,5 +1,11 @@
 # Release Notes for Debit
 
+## 1.0.2 (2019-05-22)
+
+### Fixed
+
+- A temporary in the checkout could result into an order being created twice.
+
 ## 1.0.1 (2019-05-08)
 
 ### Fixed
