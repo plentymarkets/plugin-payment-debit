@@ -4,7 +4,7 @@
 
 ### Gefixt
 
-- Ein teilweise auftretendes Problem beim Bestellabschluss konnte dazu führen, dass eine Bestellung doppelt angelegt wird. 
+- Ein teilweise auftretendes Problem beim Bestellabschluss konnte dazu führen, dass eine Bestellung doppelt angelegt wird. Dieser Fehler wurde behoben.
 
 ## 1.0.1 (2019-05-08)
 
