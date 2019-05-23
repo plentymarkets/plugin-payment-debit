@@ -1,5 +1,11 @@
 # Release Notes für Lastschrift
 
+## 1.0.3 (2019-05-23)
+
+### Gefixt
+
+- Ein Weiterleitungsproblem konnte dazu führen, dass eine nicht existierende URL zur Bestellbestätigungsseite aufgerufen wurde. Dieses Problem wurde behoben.
+
 ## 1.0.2 (2019-05-22)
 
 ### Gefixt

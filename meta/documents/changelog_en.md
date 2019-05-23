@@ -1,5 +1,11 @@
 # Release Notes for Debit
 
+## 1.0.3 (2019-05-23)
+
+### Fixed
+
+- A redirecting issue could result into a wrong URL to the order confirmation page. This has been fixed.
+
 ## 1.0.2 (2019-05-22)
 
 ### Fixed
