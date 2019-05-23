@@ -142,11 +142,11 @@ class DebitController extends Controller
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
 
-            return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/place-order');
+            return $response->redirectTo($this->sessionStorageService->getLang().'/place-order');
         }
         catch(\Exception $e)
         {
-            return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/checkout');
+            return $response->redirectTo($this->sessionStorageService->getLang().'/checkout');
         }
     }
 
@@ -185,7 +185,7 @@ class DebitController extends Controller
             $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
         }
 
-        return $response->redirectTo('/'.$this->sessionStorageService->getLang().'/confirmation/'.$orderId);
+        return $response->redirectTo($this->sessionStorageService->getLang().'/confirmation/'.$orderId);
     }
 
     private function createContactBank($bankData) {
