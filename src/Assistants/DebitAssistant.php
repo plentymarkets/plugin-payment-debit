@@ -60,13 +60,13 @@ class DebitAssistant extends WizardProvider
     {
         $config = [
             "title" => 'debitAssistant.assistantTitle',
+            "shortDescription" => 'debitAssistant.assistantShortDescription',
             "iconPath" => $this->getIcon(),
             "settingsHandlerClass" => DebitAssistantSettingsHandler::class,
             "translationNamespace" => "Debit",
             "key" => "payment-debit-assistant",
             "topics" => [
-                "payment",
-                "debit",
+                "payment"
             ],
             "options" => [
                 "config_name" => [
