@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- An error when saving the assistant without active ceres plugin has been fixed.
+- An error when saving the assistant without an active Ceres plugin has been fixed.
 
 ## 1.0.3 (2019-05-23)
 
