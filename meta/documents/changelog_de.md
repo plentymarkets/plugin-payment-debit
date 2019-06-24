@@ -4,7 +4,7 @@
 
 ### Gefixt
 
-- Beim Abschließen des Assistenten, ohne aktives Ceres Plugin, konnte es zu Fehlern kommen. Dies wurde behoben.
+- Beim Abschließen des Assistenten ohne aktives Ceres Plugin konnte es zu Fehlern kommen. Dies wurde behoben.
 
 ## 1.0.3 (2019-05-23)
 
