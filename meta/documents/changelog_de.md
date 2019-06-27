@@ -1,5 +1,11 @@
 # Release Notes für Lastschrift
 
+## 1.0.4 (2019-06-18)
+
+### Gefixt
+
+- Beim Abschließen des Assistenten ohne aktives Ceres Plugin konnte es zu Fehlern kommen. Dies wurde behoben.
+
 ## 1.0.3 (2019-05-23)
 
 ### Gefixt

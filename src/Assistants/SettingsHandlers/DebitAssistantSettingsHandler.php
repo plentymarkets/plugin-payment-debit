@@ -108,51 +108,52 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
     private function createContainer($webstoreId, $data)
     {
         $webstore = $this->getWebstore($webstoreId);
+        $debitPlugin = $this->getDebitPlugin($webstoreId);
+        $ceresPlugin = $this->getCeresPlugin($webstoreId);
 
-        /** @var PluginLayoutContainerRepositoryContract $pluginLayoutContainerRepo */
-        $pluginLayoutContainerRepo = pluginApp(PluginLayoutContainerRepositoryContract::class);
+        if( ($webstore && $webstore->pluginSetId) &&  $debitPlugin !== null && $ceresPlugin !== null) {
+            /** @var PluginLayoutContainerRepositoryContract $pluginLayoutContainerRepo */
+            $pluginLayoutContainerRepo = pluginApp(PluginLayoutContainerRepositoryContract::class);
 
-        $containerListEntries = [];
+            $containerListEntries = [];
 
-        // Default entries
-        $containerListEntries[] = $this->createContainerDataListEntry(
-            $webstoreId,
-            'Ceres::Script.AfterScriptsLoaded',
-            'Debit\Providers\DataProvider\DebitReinitializePaymentScript'
-        );
-
-        $containerListEntries[] = $this->createContainerDataListEntry(
-            $webstoreId,
-            'Ceres::MyAccount.OrderHistoryPaymentInformation',
-            'Debit\Providers\DataProvider\DebitReinitializePayment'
-        );
-
-        $containerListEntries[] = $this->createContainerDataListEntry(
-            $webstoreId,
-            'Ceres::OrderConfirmation.AdditionalPaymentInformation',
-            'Debit\Providers\DataProvider\DebitReinitializePayment'
-        );
-
-        if (isset($data['debitPaymentMethodIcon']) && $data['debitPaymentMethodIcon']) {
+            // Default entries
             $containerListEntries[] = $this->createContainerDataListEntry(
                 $webstoreId,
-                'Ceres::Homepage.PaymentMethods',
-                'Debit\Providers\Icon\IconProvider'
+                'Ceres::Script.AfterScriptsLoaded',
+                'Debit\Providers\DataProvider\DebitReinitializePaymentScript'
             );
-        } else {
-            $debitPlugin = $this->getDebitPlugin($webstoreId);
-            $ceresPlugin = $this->getCeresPlugin($webstoreId);
 
-            $pluginLayoutContainerRepo->removeOne(
-                $webstore->pluginSetId,
-                'Ceres::Homepage.PaymentMethods',
-                'Debit\Providers\Icon\IconProvider',
-                $ceresPlugin->id,
-                $debitPlugin->id
+            $containerListEntries[] = $this->createContainerDataListEntry(
+                $webstoreId,
+                'Ceres::MyAccount.OrderHistoryPaymentInformation',
+                'Debit\Providers\DataProvider\DebitReinitializePayment'
             );
+
+            $containerListEntries[] = $this->createContainerDataListEntry(
+                $webstoreId,
+                'Ceres::OrderConfirmation.AdditionalPaymentInformation',
+                'Debit\Providers\DataProvider\DebitReinitializePayment'
+            );
+
+            if (isset($data['debitPaymentMethodIcon']) && $data['debitPaymentMethodIcon']) {
+                $containerListEntries[] = $this->createContainerDataListEntry(
+                    $webstoreId,
+                    'Ceres::Homepage.PaymentMethods',
+                    'Debit\Providers\Icon\IconProvider'
+                );
+            } else {
+                $pluginLayoutContainerRepo->removeOne(
+                    $webstore->pluginSetId,
+                    'Ceres::Homepage.PaymentMethods',
+                    'Debit\Providers\Icon\IconProvider',
+                    $ceresPlugin->id,
+                    $debitPlugin->id
+                );
+            }
+
+            $pluginLayoutContainerRepo->addNew($containerListEntries, $webstore->pluginSetId);
         }
-
-        $pluginLayoutContainerRepo->addNew($containerListEntries, $webstore->pluginSetId);
     }
 
     /**

@@ -1,5 +1,11 @@
 # Release Notes for Debit
 
+## 1.0.4 (2019-06-18)
+
+### Fixed
+
+- An error when saving the assistant without an active Ceres plugin has been fixed.
+
 ## 1.0.3 (2019-05-23)
 
 ### Fixed
@@ -16,7 +22,7 @@
 
 ### Fixed
 
-- A possible problem with saving additional clients in the assistan has been fixed.
+- A possible problem with saving additional clients in the assistant has been fixed.
 
 ## 1.0.0 (2019-03-27)
 
