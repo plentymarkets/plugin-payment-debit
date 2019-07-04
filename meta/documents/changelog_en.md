@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- When using your own templates, problems could occur during order completion. This has been fixed.
+- When using custom templates for Ceres, problems could occur during order completion. This behaviour has been fixed.
 
 ## 1.0.4 (2019-06-18)
 

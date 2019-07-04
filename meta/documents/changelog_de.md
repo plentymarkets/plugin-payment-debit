@@ -4,7 +4,7 @@
 
 ### Gefixt
 
-- Bei der Verwendung von eigenen Templates konnten Probleme beim Bestellabschluss auftreten. Dies wurde behoben.
+- Bei der Verwendung von eigenen Templates für Ceres konnten Probleme beim Bestellabschluss auftreten. Dies wurde behoben.
 
 ## 1.0.4 (2019-06-18)
 
