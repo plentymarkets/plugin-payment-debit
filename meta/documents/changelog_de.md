@@ -1,5 +1,11 @@
 # Release Notes für Lastschrift
 
+## 1.0.5 (2019-07-04)
+
+### Gefixt
+
+- Bei der Verwendung von eigenen Templates für Ceres konnten Probleme beim Bestellabschluss auftreten. Dies wurde behoben.
+
 ## 1.0.4 (2019-06-18)
 
 ### Gefixt

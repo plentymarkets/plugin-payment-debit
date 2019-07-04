@@ -1,5 +1,11 @@
 # Release Notes for Debit
 
+## 1.0.5 (2019-07-04)
+
+### Fixed
+
+- When using custom templates for Ceres, problems could occur during order completion. This behaviour has been fixed.
+
 ## 1.0.4 (2019-06-18)
 
 ### Fixed
