@@ -1,5 +1,11 @@
 # Release Notes for Debit
 
+## 1.0.6 (2019-07-05)
+
+### Changed
+
+- Updated texts in the assistant for setting up the payment method.
+
 ## 1.0.5 (2019-07-04)
 
 ### Fixed
