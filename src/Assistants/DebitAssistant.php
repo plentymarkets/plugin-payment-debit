@@ -124,7 +124,7 @@ class DebitAssistant extends WizardProvider
                                 "info_page_toggle" => [
                                     'type' => 'toggle',
                                     'options' => [
-                                        'name' => '',
+                                        'name' => 'debitAssistant.infoPageToggle',
                                     ]
                                 ],
                             ],
@@ -197,7 +197,7 @@ class DebitAssistant extends WizardProvider
                                     'type' => 'toggle',
                                     'defaultValue' => false,
                                     'options' => [
-                                        'name' => '',
+                                        'name' => 'debitAssistant.logoTypeToggle',
                                     ],
                                 ],
                             ],
