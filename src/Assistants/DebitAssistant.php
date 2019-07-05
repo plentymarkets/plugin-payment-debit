@@ -65,9 +65,8 @@ class DebitAssistant extends WizardProvider
             "settingsHandlerClass" => DebitAssistantSettingsHandler::class,
             "translationNamespace" => "Debit",
             "key" => "payment-debit-assistant",
-            "topics" => [
-                "payment"
-            ],
+            "topics" => ["payment"],
+            'priority' => 990,
             "options" => [
                 "config_name" => [
                     "type" => 'select',
