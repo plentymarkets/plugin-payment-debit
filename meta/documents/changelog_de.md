@@ -1,5 +1,9 @@
 # Release Notes für Lastschrift
 
+## X.X.X (2019-12-12)
+### Geändert
+- Funktionalitäten hinzugefügt für Backend-Sichtbarkeiten
+
 ## 1.0.6 (2019-07-05)
 
 ### Geändert
