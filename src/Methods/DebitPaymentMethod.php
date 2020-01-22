@@ -247,4 +247,14 @@ class DebitPaymentMethod extends PaymentMethodService
     {
         return $this->translator->trans('Debit::PaymentMethod.paymentMethodName',[],$lang);
     }
+
+    /**
+     * Check if this payment method can handle subscriptions
+     *
+     * @return bool
+     */
+    public function canHandleSubscriptions():bool
+    {
+        return true;
+    }
 }
