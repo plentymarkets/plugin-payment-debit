@@ -3,8 +3,10 @@
 namespace Debit\Methods;
 
 use Debit\Helper\DebitHelper;
+use Plenty\Legacy\Repositories\Frontend\CurrencyExchangeRepository;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
@@ -188,11 +190,95 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Check if it is allowed to switch to this payment method
      *
+     * @param int|null $orderId
      * @return bool
      */
-    public function isSwitchableTo()
+    public function isSwitchableTo(int $orderId = null)
     {
-        return false;
+        if(!is_null($orderId) && $orderId > 0) {
+
+            try {
+
+                /** @var OrderRepositoryContract $orderRepo */
+                $orderRepo = pluginApp(OrderRepositoryContract::class);
+                $filters = $orderRepo->getFilters();
+                $filters['addOrderItems'] = false;
+                $orderRepo->setFilters($filters);
+
+                $order = $orderRepo->findOrderById($orderId, ['relations', 'billingAddress', 'deliveryAddress']);
+
+                $customerId = $this->debitHelper->getCustomerId($order);
+
+                $isInvoiceAvailableForLoggedInCustomer = $this->debitHelper->isInvoiceAvailableForCurrentLoggedInCustomer(
+                    $this->accountService,
+                    $this->settings,
+                    $customerId
+                );
+
+                if (null !== $isInvoiceAvailableForLoggedInCustomer) {
+                    return $isInvoiceAvailableForLoggedInCustomer;
+                }
+
+                /**
+                 * Check whether the user is logged in
+                 */
+                if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
+                {
+                    return false;
+                }
+
+
+                if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
+                {
+                    return false;
+                }
+
+
+                return true;
+
+            } catch(\Exception $e) {}
+
+        } else {
+
+            try {
+
+                $basketRepositoryContract = pluginApp(BasketRepositoryContract::class);
+
+                /** @var Basket $basket */
+                $basket = $basketRepositoryContract->load();
+
+                $isInvoiceAvailableForLoggedInCustomer = $this->debitHelper->isInvoiceAvailableForCurrentLoggedInCustomer(
+                    $this->accountService,
+                    $this->settings,
+                    $basket->customerId
+                );
+
+                if (null !== $isInvoiceAvailableForLoggedInCustomer) {
+                    return $isInvoiceAvailableForLoggedInCustomer;
+                }
+
+                /**
+                 * Check whether the user is logged in
+                 */
+                if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
+                {
+                    return false;
+                }
+
+
+                if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
+                {
+                    return false;
+                }
+
+                return true;
+
+            } catch(\Exception $e) {}
+
+        }
+
+        return true;
+
     }
 
     /**

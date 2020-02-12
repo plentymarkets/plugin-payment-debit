@@ -3,11 +3,17 @@
 namespace Debit\Helper;
 
 use Debit\Services\SessionStorageService;
+use Debit\Services\SettingsService;
 use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
+use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
+use Plenty\Modules\Account\Contact\Models\Contact;
+use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
 use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Order\RelationReference\Models\OrderRelationReference;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
@@ -236,5 +242,66 @@ class DebitHelper
         $paymentProperty->typeId = $typeId;
         $paymentProperty->value = $value;
         return $paymentProperty;
+    }
+
+    /**
+     * Return null if no conditions is accomplished otherwise true
+     *
+     * @param AccountService $accountService
+     * @param SettingsService $settings
+     * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
+     */
+    public function isInvoiceAvailableForCurrentLoggedInCustomer(
+        AccountService $accountService,
+        SettingsService $settings,
+        $customerId
+    )
+    {
+
+        if($accountService->getIsAccountLoggedIn() && (int)$customerId > 0) {
+
+            /** @var ContactRepositoryContract $contactRepository */
+            $contactRepository = pluginApp(ContactRepositoryContract::class);
+            $contact = $contactRepository->findContactById((int)$customerId);
+
+            if(!is_null($contact) && $contact instanceof Contact) {
+
+                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
+                    if($method instanceof ContactAllowedMethodOfPayment) {
+                        if($method->methodOfPaymentId == $this->getOldDebitMopId() && $method->allowed) {
+                            return true;
+                        }
+                    }
+                });
+
+                if($allowed) {
+                    return true;
+                }
+
+            }
+
+        }
+
+        return null;
+
+    }
+
+    /**
+     * @param Order $order
+     * @return int
+     */
+    public function getCustomerId(Order $order)
+    {
+        $relation = $order->relations
+            ->where('referenceType', OrderRelationReference::REFERENCE_TYPE_CONTACT)
+            ->where('relation', OrderRelationReference::RELATION_TYPE_RECEIVER)
+            ->first();
+
+        if ($relation !== null) {
+            return $relation->referenceId;
+        }
+
+        return 0;
     }
 }
