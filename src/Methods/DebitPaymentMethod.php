@@ -71,42 +71,35 @@ class DebitPaymentMethod extends PaymentMethodService
      * Check whether Debit is active or not
      *
      * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
      */
     public function isActive()
     {
         /** @var Basket $basket */
         $basket = $this->basketRepo->load();
-        if($this->accountService->getIsAccountLoggedIn() && $basket->customerId > 0) {
+
+        if (!$this->isGuest($basket->customerId)) {
+
             /** @var ContactRepositoryContract $contactRepository */
             $contactRepository = pluginApp(ContactRepositoryContract::class);
             $contact = $contactRepository->findContactById($basket->customerId);
-            if(!is_null($contact) && $contact instanceof Contact) {
-                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
-                    if($method instanceof ContactAllowedMethodOfPayment) {
-                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
-                            || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
-                            return true;
-                        }
-                    }
-                });
-                if($allowed) {
-                    return true;
+
+            if (!$this->hasActiveShippingCountry()) {
+                if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                    return false;
                 }
             }
-        }
 
-        /**
-         * Check whether the user is logged in
-         */
-        if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
-        {
-            return false;
-        }
+        } else {
 
+            if (!$this->hasActiveShippingCountry()) {
+                return false;
+            }
 
-        if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
-        {
-            return false;
+            if(!$this->settings->getSetting('allowDebitForGuest') && $this->isGuest($basket->customerId)) {
+                return false;
+            }
+
         }
 
         return true;
@@ -192,6 +185,7 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @param int|null $orderId
      * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
      */
     public function isSwitchableTo(int $orderId = null)
     {
@@ -205,36 +199,23 @@ class DebitPaymentMethod extends PaymentMethodService
                 $filters['addOrderItems'] = false;
                 $orderRepo->setFilters($filters);
 
-                $order = $orderRepo->findOrderById($orderId, ['relations', 'billingAddress', 'deliveryAddress']);
+                $order = $orderRepo->findOrderById($orderId, ['amounts', 'contactReceiver']);
 
-                $customerId = $this->debitHelper->getCustomerId($order);
+                $customerId = $order->contactReceiver !== null ? $order->contactReceiver->id : 0;
 
-                $isInvoiceAvailableForLoggedInCustomer = $this->debitHelper->isInvoiceAvailableForCurrentLoggedInCustomer(
-                    $this->accountService,
-                    $this->settings,
-                    $customerId
-                );
+                if (!$this->isGuest($customerId)) {
 
-                if (null !== $isInvoiceAvailableForLoggedInCustomer) {
-                    return $isInvoiceAvailableForLoggedInCustomer;
+                    /** @var ContactRepositoryContract $contactRepository */
+                    $contactRepository = pluginApp(ContactRepositoryContract::class);
+                    $contact = $contactRepository->findContactById($customerId);
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                            return false;
+                        }
+                    }
+
                 }
-
-                /**
-                 * Check whether the user is logged in
-                 */
-                if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
-                {
-                    return false;
-                }
-
-
-                if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
-                {
-                    return false;
-                }
-
-
-                return true;
 
             } catch(\Exception $e) {}
 
@@ -247,38 +228,35 @@ class DebitPaymentMethod extends PaymentMethodService
                 /** @var Basket $basket */
                 $basket = $basketRepositoryContract->load();
 
-                $isInvoiceAvailableForLoggedInCustomer = $this->debitHelper->isInvoiceAvailableForCurrentLoggedInCustomer(
-                    $this->accountService,
-                    $this->settings,
-                    $basket->customerId
-                );
+                if (!$this->isGuest($basket->customerId)) {
 
-                if (null !== $isInvoiceAvailableForLoggedInCustomer) {
-                    return $isInvoiceAvailableForLoggedInCustomer;
+                    /** @var ContactRepositoryContract $contactRepository */
+                    $contactRepository = pluginApp(ContactRepositoryContract::class);
+                    $contact = $contactRepository->findContactById($basket->customerId);
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                            return false;
+                        }
+                    }
+
+                } else {
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        return false;
+                    }
+
+                    if( !$this->settings->getSetting('allowDebitForGuest') && $this->isGuest($basket->customerId)) {
+                        return false;
+                    }
+
                 }
-
-                /**
-                 * Check whether the user is logged in
-                 */
-                if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
-                {
-                    return false;
-                }
-
-
-                if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
-                {
-                    return false;
-                }
-
-                return true;
 
             } catch(\Exception $e) {}
 
         }
 
         return true;
-
     }
 
     /**
@@ -343,4 +321,73 @@ class DebitPaymentMethod extends PaymentMethodService
     {
         return true;
     }
+
+    /**
+     * @param int $customerId
+     * @return bool
+     */
+    private function isGuest($customerId)
+    {
+        return !$this->accountService->getIsAccountLoggedIn() && (int)$customerId === 0;
+    }
+
+    /**
+     * @param Contact $contact
+     * @return bool
+     */
+    private function isExplicitlyAllowedForThisCustomer(Contact $contact)
+    {
+        if(!$this->isGuest($contact->id)) {
+
+            if (!is_null($contact) && $contact instanceof Contact) {
+
+                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
+                    if($method instanceof ContactAllowedMethodOfPayment) {
+                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
+                            || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
+                            return true;
+                        }
+                    }
+                });
+
+                if ($allowed) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+
+            }
+
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @param $lang
+     * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
+     */
+    private function doNotAllowInvoiceForGuests($lang)
+    {
+        return (int)$this->settings->getSetting('disallowInvoiceForGuest',$lang) === 1;
+    }
+
+    /**
+     * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
+     */
+    private function hasActiveShippingCountry()
+    {
+        if (empty($this->settings->getShippingCountries()) || !in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries())) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+
 }
