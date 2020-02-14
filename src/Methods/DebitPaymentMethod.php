@@ -366,16 +366,6 @@ class DebitPaymentMethod extends PaymentMethodService
     }
 
     /**
-     * @param $lang
-     * @return bool
-     * @throws \Plenty\Exceptions\ValidationException
-     */
-    private function doNotAllowInvoiceForGuests($lang)
-    {
-        return (int)$this->settings->getSetting('disallowInvoiceForGuest',$lang) === 1;
-    }
-
-    /**
      * @return bool
      * @throws \Plenty\Exceptions\ValidationException
      */
