@@ -328,14 +328,14 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     private function isGuest($customerId)
     {
-        return !$this->accountService->getIsAccountLoggedIn() && (int)$customerId === 0;
+        return !$this->accountService->getIsAccountLoggedIn() || $customerId <= 0;
     }
 
     /**
      * @param Contact $contact
      * @return bool
      */
-    private function isExplicitlyAllowedForThisCustomer(Contact $contact)
+    private function isExplicitlyAllowedForThisCustomer(Contact $contact = null)
     {
         if(!$this->isGuest($contact->id)) {
 
