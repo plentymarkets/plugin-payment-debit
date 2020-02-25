@@ -337,32 +337,21 @@ class DebitPaymentMethod extends PaymentMethodService
      */
     private function isExplicitlyAllowedForThisCustomer(Contact $contact = null)
     {
-        if(!$this->isGuest($contact->id)) {
-
-            if (!is_null($contact) && $contact instanceof Contact) {
-
-                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
-                    if($method instanceof ContactAllowedMethodOfPayment) {
-                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
-                            || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
-                            return true;
-                        }
-                    }
-                });
-
-                if ($allowed) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-
-            }
-
-        } else {
+        if (is_null($contact)) {
             return false;
         }
+
+        $allowed = $contact->allowedMethodsOfPayment->first(function ($method) {
+            if ($method instanceof ContactAllowedMethodOfPayment) {
+                if ($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
+                    || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
+                    return true;
+                }
+            }
+        });
+
+        return $allowed ? true : false;
+
     }
 
     /**
