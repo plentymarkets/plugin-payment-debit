@@ -14,6 +14,7 @@ use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
+use Plenty\Plugin\Http\Request;
 
 class DebitController extends Controller
 {
@@ -89,7 +90,7 @@ class DebitController extends Controller
      *
      * @return BaseResponse
      */
-    public function setBankDetails(Response $response)
+    public function setBankDetails(Response $response, Request $request)
     {
         /** @var BasketRepositoryContract $basketRepo */
         $basketRepo = pluginApp(BasketRepositoryContract::class);
@@ -97,10 +98,10 @@ class DebitController extends Controller
 
         $bankData = [
             'contactId'     => $basket->customerId,
-            'accountOwner'  => $_REQUEST['bankAccountOwner'],
-            'bankName'      => $_REQUEST['bankName'],
-            'iban'          => $_REQUEST['bankIban'],
-            'bic'           => $_REQUEST['bankBic'],
+            'accountOwner'  => $request->get('bankAccountOwner'),
+            'bankName'      => $request->get('bankName'),
+            'iban'          => $request->get('bankIban'),
+            'bic'           => $request->get('bankBic'),
             'lastUpdateBy'  => 'customer'
         ];
 
@@ -154,21 +155,20 @@ class DebitController extends Controller
      *
      * @return BaseResponse
      */
-    public function updateBankDetails(Response $response)
+    public function updateBankDetails(Response $response, Request $request)
     {
-        $orderId = $_REQUEST['orderId'];
+        $orderId = $request->get('orderId');
         $bankData = [
-            'accountOwner'  => $_REQUEST['bankAccountOwner'],
-            'bankName'      => $_REQUEST['bankName'],
-            'iban'          => $_REQUEST['bankIban'],
-            'bic'           => $_REQUEST['bankBic'],
+            'accountOwner'  => $request->get('bankAccountOwner'),
+            'bankName'      => $request->get('bankName'),
+            'iban'          => $request->get('bankIban'),
+            'bic'           => $request->get('bankBic'),
             'lastUpdateBy'  => 'customer',
             'orderId'       => $orderId
         ];
-
-        if (isset($_REQUEST['bankId']) && $_REQUEST['bankId'] > 0) {
+        if ($request->has('bankId') && $request->get('bankId') > 0) {
             //update existing bankaccount
-            $bankData['bankId'] = $_REQUEST['bankId'];
+            $bankData['bankId'] = $request->get('bankId');
             $contactBank = $this->updateContactBank($bankData);
         } else {
             //create new bank account
