@@ -1,8 +1,8 @@
 # Release Notes for Debit
 
-## X.X.X (2019-12-17)
+## 1.0.7 (2020-02-26)
 ### Changed
-- Added methods for the backend visibility and backend name
+- Security adjustment
 
 ## 1.0.6 (2019-07-05)
 
