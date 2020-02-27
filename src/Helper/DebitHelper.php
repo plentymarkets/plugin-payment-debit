@@ -187,27 +187,29 @@ class DebitHelper
         ];
 
 
+
+
 //We dont want to save the contactId to till the ui for the customer bankdata is updated
 
-//        /** @var OrderRepositoryContract $orderContract */
-//        $orderContract = pluginApp(OrderRepositoryContract::class);
-//
-//        /** @var Order $order */
-//        // use processUnguarded to find orders for guests
-//        $order = $authHelper->processUnguarded(
-//            function () use ($orderContract, $orderId) {
-//                //unguarded
-//                return $orderContract->findOrderById($orderId, ['relation']);
-//            }
-//        );
-//        // Check whether the order truly exists in plentymarkets
-//        if(!is_null($order) && $order instanceof Order)
-//        {
-//            $contactId = $order->contactReceiver->id;
-//            if($contactId>0){
-//                $bankData['contactId'] = $contactId;
-//            }
-//        }
+        /** @var OrderRepositoryContract $orderContract */
+        $orderContract = pluginApp(OrderRepositoryContract::class);
+
+        /** @var Order $order */
+        // use processUnguarded to find orders for guests
+        $order = $authHelper->processUnguarded(
+            function () use ($orderContract, $orderId) {
+                //unguarded
+                return $orderContract->findOrderById($orderId, ['relation']);
+            }
+        );
+        // Check whether the order truly exists in plentymarkets
+        if(!is_null($order) && $order instanceof Order)
+        {
+            $contactId = $order->contactReceiver->id;
+            if($contactId>0){
+                $bankData['contactId'] = $contactId;
+            }
+        }
 
         /** @var ContactPaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
