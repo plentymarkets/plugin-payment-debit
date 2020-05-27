@@ -257,4 +257,16 @@ class DebitPaymentMethod extends PaymentMethodService
     {
         return true;
     }
+
+    /**
+     * Get the url for the backend icon
+     *
+     * @return string
+     */
+    public function getBackendIcon(): string
+    {
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('debit').'/images/logos/debit_backend_icon.svg';
+        return $icon;
+    }
 }
