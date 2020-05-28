@@ -5,7 +5,6 @@ namespace Debit\Methods;
 use Debit\Helper\DebitHelper;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
-use Plenty\Modules\Payment\Method\Contracts\PaymentMethodService;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
@@ -13,6 +12,7 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 use Plenty\Plugin\Application;
 use Debit\Services\SettingsService;
 use Plenty\Plugin\Translation\Translator;
@@ -21,7 +21,7 @@ use Plenty\Plugin\Translation\Translator;
  * Class DebitPaymentMethod
  * @package Debit\Methods
  */
-class DebitPaymentMethod extends PaymentMethodService
+class DebitPaymentMethod extends PaymentMethodBaseService
 {
     /** @var BasketRepositoryContract */
     private $basketRepo;
@@ -70,7 +70,7 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function isActive()
+    public function isActive(): bool
     {
         /** @var Basket $basket */
         $basket = $this->basketRepo->load();
@@ -113,9 +113,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get DebitSourceUrl
      *
+     * @param string $lang
      * @return string
      */
-    public function getSourceUrl()
+    public function getSourceUrl(string $lang): string
     {
         if ($this->settings->getSetting('info_page_toggle')) {
             $infoPageType = $this->settings->getSetting('info_page_type');
@@ -142,9 +143,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get Debit Icon
      *
+     * @param string $lang
      * @return string
      */
-    public function getIcon( )
+    public function getIcon(string $lang): string
     {
         if(!$this->settings->getSetting('logo_type_external'))
         {
@@ -168,9 +170,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get shown name
      *
+     * @param string $lang
      * @return string
      */
-    public function getName()
+    public function getName(string $lang): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodName");
     }
@@ -178,9 +181,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get the description of the payment method.
      *
+     * @param string $lang
      * @return string
      */
-    public function getDescription()
+    public function getDescription(string $lang): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodDescription");
     }
@@ -190,7 +194,7 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function isSwitchableTo()
+    public function isSwitchableTo(): bool
     {
         return false;
     }
@@ -200,7 +204,7 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function isSwitchableFrom()
+    public function isSwitchableFrom(): bool
     {
         return false;
     }
