@@ -116,7 +116,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getSourceUrl(string $lang): string
+    public function getSourceUrl(string $lang = 'de'): string
     {
         if ($this->settings->getSetting('info_page_toggle')) {
             $infoPageType = $this->settings->getSetting('info_page_type');
@@ -146,7 +146,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getIcon(string $lang): string
+    public function getIcon(string $lang = 'de'): string
     {
         if(!$this->settings->getSetting('logo_type_external'))
         {
@@ -173,7 +173,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getName(string $lang): string
+    public function getName(string $lang = 'de'): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodName");
     }
@@ -184,7 +184,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getDescription(string $lang): string
+    public function getDescription(string $lang = 'de'): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodDescription");
     }
@@ -247,7 +247,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * @param string $lang
      * @return string
      */
-    public function getBackendName(string $lang):string
+    public function getBackendName(string $lang = 'de'):string
     {
         return $this->translator->trans('Debit::PaymentMethod.paymentMethodName',[],$lang);
     }
