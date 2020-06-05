@@ -20,7 +20,7 @@ class SettingsService extends DatabaseBaseService
     protected $systemService;
 
     /** @var array */
-    private $settings;
+    private $settings = [];
 
     public function __construct(SystemService $systemService, DataBase $db)
     {
@@ -88,7 +88,7 @@ class SettingsService extends DatabaseBaseService
         if (is_array($setting) && $setting[0] instanceof Settings) {
             return $setting[0]->value;
         }
-        return null;
+        return [];
     }
 
     public function loadSettings($settingType)
