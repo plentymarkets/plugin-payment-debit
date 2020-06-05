@@ -1,10 +1,15 @@
 # Release Notes für Lastschrift
 
-## 1.0.8 (2020-27-05)
+## 1.0.8 (2020-06-05)
+
+### Gefixt
+- Einstellungen werden nun für den korrekten Mandanten geladen.
+
 ### Geändert
 - Icon für das Backend hinzugefügt
 
 ## 1.0.7 (2020-02-26)
+
 ### Gefixt
 - Sicherheitsanpassung
 
