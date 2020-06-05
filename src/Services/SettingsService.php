@@ -113,9 +113,11 @@ class SettingsService extends DatabaseBaseService
             $this->settings = $this->loadSetting($plentyId, 'debit');
         }
 
-        foreach ($this->settings as $name => $value) {
-            if ($name == $settingType) {
-                return $value;
+        if(is_array($this->settings)) {
+            foreach ($this->settings as $name => $value) {
+                if ($name == $settingType) {
+                    return $value;
+                }
             }
         }
 
