@@ -9,46 +9,43 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 
 use Debit\Models\Settings;
 use Plenty\Plugin\Application;
-
+use Plenty\Modules\Frontend\Services\SystemService;
 
 class SettingsService extends DatabaseBaseService
 {
-    /** @var Application  */
+    /** @var Application */
     private $app;
 
-    /** @var array  */
-    private $settings;
+    /** @var $systemService SystemService */
+    protected $systemService;
 
-    public function __construct(Application $app, DataBase $db)
+    /** @var array */
+    private $settings = [];
+
+    public function __construct(SystemService $systemService, DataBase $db)
     {
-        $this->app = $app;
+        $this->systemService = $systemService;
         parent::__construct($db);
     }
 
     public function saveSettings($mode, $settings)
     {
-        if($settings)
-        {
-            foreach ($settings as $store => $values)
-            {
+        if ($settings) {
+            foreach ($settings as $store => $values) {
                 $id = 0;
                 $store = (int)str_replace('PID_', '', $store);
 
-                if($store > 0)
-                {
-                    $existValue = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $store], ['=','=']);
-                    if(isset($existValue) && is_array($existValue))
-                    {
-                        if($existValue[0] instanceof Settings)
-                        {
+                if ($store > 0) {
+                    $existValue = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $store], ['=', '=']);
+                    if (isset($existValue) && is_array($existValue)) {
+                        if ($existValue[0] instanceof Settings) {
                             $id = $existValue[0]->id;
                         }
                     }
 
                     /** @var Settings $settingModel */
                     $settingModel = pluginApp(Settings::class);
-                    if($id > 0)
-                    {
+                    if ($id > 0) {
                         $settingModel->id = $id;
                     }
                     $settingModel->webstore = $store;
@@ -56,8 +53,7 @@ class SettingsService extends DatabaseBaseService
                     $settingModel->value = $values;
                     $settingModel->updatedAt = date('Y-m-d H:i:s');
 
-                    if($settingModel instanceof Settings)
-                    {
+                    if ($settingModel instanceof Settings) {
                         $this->setValue($settingModel);
                     }
                 }
@@ -71,17 +67,14 @@ class SettingsService extends DatabaseBaseService
         //delete existing ShippingCountrySettings
         $this->deleteShippingCountrySettingsByPlentyId($settings['plentyId']);
 
-        if($settings)
-        {
-            foreach ($settings['countries'] as $countryId)
-            {
+        if ($settings) {
+            foreach ($settings['countries'] as $countryId) {
                 /** @var ShippingCountrySettings $shippingCountrySettings */
                 $shippingCountrySettings = pluginApp(ShippingCountrySettings::class);
                 $shippingCountrySettings->plentyId = $settings['plentyId'];
                 $shippingCountrySettings->shippingCountryId = $countryId;
 
-                if($shippingCountrySettings instanceof ShippingCountrySettings)
-                {
+                if ($shippingCountrySettings instanceof ShippingCountrySettings) {
                     $this->setValue($shippingCountrySettings);
                 }
             }
@@ -91,24 +84,20 @@ class SettingsService extends DatabaseBaseService
 
     public function loadSetting($webstore, $mode)
     {
-        $setting = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $webstore], ['=','=']);
-        if(is_array($setting) && $setting[0] instanceof Settings)
-        {
+        $setting = $this->getValues(Settings::class, ['name', 'webstore'], [$mode, $webstore], ['=', '=']);
+        if (is_array($setting) && $setting[0] instanceof Settings) {
             return $setting[0]->value;
         }
-        return null;
+        return [];
     }
 
     public function loadSettings($settingType)
     {
         $settings = array();
         $results = $this->getValues(Settings::class);
-        if(is_array($results))
-        {
-            foreach ($results as $item)
-            {
-                if($item instanceof Settings && $item->name == $settingType)
-                {
+        if (is_array($results)) {
+            foreach ($results as $item) {
+                if ($item instanceof Settings && $item->name == $settingType) {
                     $settings[] = [$item->webstore => $item->value];
                 }
             }
@@ -118,17 +107,20 @@ class SettingsService extends DatabaseBaseService
 
     public function getSetting($settingType)
     {
+        $plentyId = $this->systemService->getPlentyId();
+
         if (!isset($this->settings)) {
-            $this->settings = $this->loadSettings("debit");
+            $this->settings = $this->loadSetting($plentyId, 'debit');
         }
 
-        $plentyId = $this->app->getPlentyId();
-
-        foreach ($this->settings[0][$plentyId] as $name => $value) {
-            if ($name == $settingType) {
-                return $value;
+        if(is_array($this->settings)) {
+            foreach ($this->settings as $name => $value) {
+                if ($name == $settingType) {
+                    return $value;
+                }
             }
         }
+
         return "";
     }
 
@@ -142,7 +134,7 @@ class SettingsService extends DatabaseBaseService
             /** @var ShippingCountrySettings[] $shippingCountrySettings */
             $shippingCountrySettings = $query->get();
 
-            foreach($shippingCountrySettings as $shippingSetting){
+            foreach ($shippingCountrySettings as $shippingSetting) {
                 $this->dataBase->delete($shippingSetting);
             }
         }
@@ -156,7 +148,7 @@ class SettingsService extends DatabaseBaseService
      */
     public function getShippingCountries()
     {
-        $plentyId = $this->app->getPlentyId();
+        $plentyId = $this->systemService->getPlentyId();
 
         return $this->getShippingCountriesByPlentyId($plentyId);
     }
@@ -176,11 +168,10 @@ class SettingsService extends DatabaseBaseService
         $shippingCountrySettings = $query->get();
 
         $shippingCountriesArray = [];
-        foreach($shippingCountrySettings as $shippingSetting){
+        foreach ($shippingCountrySettings as $shippingSetting) {
             $shippingCountriesArray[] = (int)$shippingSetting->shippingCountryId;
         }
 
         return $shippingCountriesArray;
     }
-
 }

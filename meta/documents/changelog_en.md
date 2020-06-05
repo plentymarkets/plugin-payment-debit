@@ -1,5 +1,13 @@
 # Release Notes for Debit
 
+## 1.0.8 (2020-06-05)
+
+### Fixed
+- Settings now loaded for the correct client.
+
+### Changed
+- Added Icon for the backend
+
 ## 1.0.7 (2020-02-26)
 ### Changed
 - Security adjustment
