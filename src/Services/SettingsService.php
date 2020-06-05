@@ -9,19 +9,22 @@ use Plenty\Modules\Plugin\DataBase\Contracts\Query;
 
 use Debit\Models\Settings;
 use Plenty\Plugin\Application;
-
+use Plenty\Modules\Frontend\Services\SystemService;
 
 class SettingsService extends DatabaseBaseService
 {
     /** @var Application  */
     private $app;
 
+    /** @var $systemService SystemService */
+    protected $systemService;
+
     /** @var array  */
     private $settings;
 
-    public function __construct(Application $app, DataBase $db)
+    public function __construct(SystemService $systemService, DataBase $db)
     {
-        $this->app = $app;
+        $this->systemService = $systemService;
         parent::__construct($db);
     }
 
@@ -122,7 +125,7 @@ class SettingsService extends DatabaseBaseService
             $this->settings = $this->loadSettings("debit");
         }
 
-        $plentyId = $this->app->getPlentyId();
+        $plentyId = $this->systemService->getPlentyId();
 
         foreach ($this->settings[0][$plentyId] as $name => $value) {
             if ($name == $settingType) {
@@ -156,7 +159,7 @@ class SettingsService extends DatabaseBaseService
      */
     public function getShippingCountries()
     {
-        $plentyId = $this->app->getPlentyId();
+        $plentyId = $this->systemService->getPlentyId();
 
         return $this->getShippingCountriesByPlentyId($plentyId);
     }
