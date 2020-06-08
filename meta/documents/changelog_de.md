@@ -1,5 +1,10 @@
 # Release Notes für Lastschrift
 
+## 1.0.9 (2020-06-10)
+
+### Gefixt
+- Assistenten kann wieder abgeschlossen werden
+
 ## 1.0.8 (2020-06-05)
 
 ### Gefixt

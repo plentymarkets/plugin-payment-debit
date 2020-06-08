@@ -33,7 +33,7 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
     {
         $data = $parameter['data'];
         $webstoreId = $data['config_name'];
-        if ((!is_numeric($webstoreId) || $webstoreId <= 0) && !$this->isValidUUIDv4($parameter['optionId'])) {
+        if ((!is_numeric($webstoreId) || $webstoreId < 0) && !$this->isValidUUIDv4($parameter['optionId'])) {
             $webstoreId = $parameter['optionId'];
         }
 
