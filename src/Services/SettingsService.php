@@ -20,7 +20,7 @@ class SettingsService extends DatabaseBaseService
     protected $systemService;
 
     /** @var array */
-    private $settings = [];
+    private $settings = null;
 
     public function __construct(SystemService $systemService, DataBase $db)
     {
