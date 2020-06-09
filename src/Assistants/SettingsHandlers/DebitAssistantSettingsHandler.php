@@ -32,11 +32,9 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
     public function handle(array $parameter)
     {
         $data = $parameter['data'];
-
-        if (!$this->isValidUUIDv4($parameter['optionId'])) {
+        $webstoreId = $data['config_name'];
+        if ((!is_numeric($webstoreId) || $webstoreId < 0) && !$this->isValidUUIDv4($parameter['optionId'])) {
             $webstoreId = $parameter['optionId'];
-        } else {
-            $webstoreId = $data['config_name'];
         }
 
         $this->saveDebitSettings($webstoreId, $data);
@@ -175,8 +173,8 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
         $dataListEntry['dataProviderPluginId'] = $debitPlugin->id;
         $dataListEntry['containerPluginId'] = $ceresPlugin->id;
         $dataListEntry['pluginSetId'] = $webstore->pluginSetId;
-        $dataListEntry['dataProviderPluginSetEntryId'] = $debitPlugin->pluginSetEntries[0]->id;
-        $dataListEntry['containerPluginSetEntryId'] = $ceresPlugin->pluginSetEntries[0]->id;
+        $dataListEntry['dataProviderPluginSetEntryId'] = $debitPlugin->pluginSetEntries->firstWhere('pluginSetId', $webstore->pluginSetId)->id;
+        $dataListEntry['containerPluginSetEntryId'] = $ceresPlugin->pluginSetEntries->firstWhere('pluginSetId', $webstore->pluginSetId)->id;
 
         return $dataListEntry;
     }
