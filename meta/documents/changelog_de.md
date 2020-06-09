@@ -1,4 +1,8 @@
 # Release Notes für Lastschrift
+## 1.0.10 (2020-06-10)
+
+### Gefixt
+- Einstellungen werden nun korrekt geladen.
 
 ## 1.0.9 (2020-06-10)
 
