@@ -15,6 +15,7 @@ use Plenty\Modules\Basket\Models\Basket;
 use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
+use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 use Plenty\Plugin\Application;
 use Debit\Services\SettingsService;
 use Plenty\Plugin\Translation\Translator;
@@ -23,7 +24,7 @@ use Plenty\Plugin\Translation\Translator;
  * Class DebitPaymentMethod
  * @package Debit\Methods
  */
-class DebitPaymentMethod extends PaymentMethodService
+class DebitPaymentMethod extends PaymentMethodBaseService
 {
     /** @var BasketRepositoryContract */
     private $basketRepo;
@@ -73,7 +74,7 @@ class DebitPaymentMethod extends PaymentMethodService
      * @return bool
      * @throws \Plenty\Exceptions\ValidationException
      */
-    public function isActive()
+    public function isActive(): bool
     {
         /** @var Basket $basket */
         $basket = $this->basketRepo->load();
@@ -108,9 +109,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get DebitSourceUrl
      *
+     * @param string $lang
      * @return string
      */
-    public function getSourceUrl()
+    public function getSourceUrl(string $lang = 'de'): string
     {
         if ($this->settings->getSetting('info_page_toggle')) {
             $infoPageType = $this->settings->getSetting('info_page_type');
@@ -137,9 +139,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get Debit Icon
      *
+     * @param string $lang
      * @return string
      */
-    public function getIcon( )
+    public function getIcon(string $lang = 'de'): string
     {
         if(!$this->settings->getSetting('logo_type_external'))
         {
@@ -163,9 +166,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get shown name
      *
+     * @param string $lang
      * @return string
      */
-    public function getName()
+    public function getName(string $lang = 'de'): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodName");
     }
@@ -173,9 +177,10 @@ class DebitPaymentMethod extends PaymentMethodService
     /**
      * Get the description of the payment method.
      *
+     * @param string $lang
      * @return string
      */
-    public function getDescription()
+    public function getDescription(string $lang = 'de'): string
     {
         return $this->translator->trans("Debit::PaymentMethod.paymentMethodDescription");
     }
@@ -187,7 +192,7 @@ class DebitPaymentMethod extends PaymentMethodService
      * @return bool
      * @throws \Plenty\Exceptions\ValidationException
      */
-    public function isSwitchableTo(int $orderId = null)
+    public function isSwitchableTo(int $orderId = null):bool
     {
         if(!is_null($orderId) && $orderId > 0) {
 
@@ -264,7 +269,7 @@ class DebitPaymentMethod extends PaymentMethodService
      *
      * @return bool
      */
-    public function isSwitchableFrom()
+    public function isSwitchableFrom(): bool
     {
         return false;
     }
@@ -307,7 +312,7 @@ class DebitPaymentMethod extends PaymentMethodService
      * @param string $lang
      * @return string
      */
-    public function getBackendName(string $lang):string
+    public function getBackendName(string $lang = 'de'):string
     {
         return $this->translator->trans('Debit::PaymentMethod.paymentMethodName',[],$lang);
     }
@@ -320,6 +325,18 @@ class DebitPaymentMethod extends PaymentMethodService
     public function canHandleSubscriptions():bool
     {
         return true;
+    }
+
+    /**
+     * Get the url for the backend icon
+     *
+     * @return string
+     */
+    public function getBackendIcon(): string
+    {
+        $app = pluginApp(Application::class);
+        $icon = $app->getUrlPath('debit').'/images/logos/debit_backend_icon.svg';
+        return $icon;
     }
 
     /**

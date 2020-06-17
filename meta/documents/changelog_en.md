@@ -1,8 +1,26 @@
 # Release Notes for Debit
 
-## X.X.X (2019-12-17)
+## 1.0.10 (2020-06-10)
+
+### Fixed
+- Settings now loaded correct
+
+## 1.0.9 (2020-06-10)
+
+### Fixed
+- Assistant can be completed again
+
+## 1.0.8 (2020-06-05)
+
+### Fixed
+- Settings now loaded for the correct client.
+
 ### Changed
-- Added methods for the backend visibility and backend name
+- Added Icon for the backend
+
+## 1.0.7 (2020-02-26)
+### Changed
+- Security adjustment
 
 ## 1.0.6 (2019-07-05)
 
