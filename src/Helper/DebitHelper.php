@@ -3,21 +3,14 @@
 namespace Debit\Helper;
 
 use Debit\Services\SessionStorageService;
-use Debit\Services\SettingsService;
 use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
-use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
-use Plenty\Modules\Account\Contact\Models\Contact;
-use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
 use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Order\RelationReference\Models\OrderRelationReference;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
 use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
-use Plenty\Modules\Payment\Method\Models\PaymentMethod;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 
@@ -243,5 +236,4 @@ class DebitHelper
         $paymentProperty->value = $value;
         return $paymentProperty;
     }
-
 }
