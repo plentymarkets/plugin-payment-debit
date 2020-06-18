@@ -1,5 +1,5 @@
 {
-  "version"           : "1.0.10",
+  "version"           : "1.0.11",
   "name"              : "Debit",
   "marketplaceName"   : {"de":"Lastschrift","en":"Debit"},
   "license"           : "AGPL-3.0",
@@ -7,7 +7,7 @@
   "price"             : 0.00,
   "description"       : "Debit plugin for plentymarkets online stores",
   "shortDescription"  : {"de": "Zahlungsart Lastschrift für plentymarkets Webshops","en": "Payment method debit for plentymarkets online stores"},
-  "categories"        : ["3519"],
+  "categories"        : ["4083"],
   "author"            : "plentysystems AG",
   "authorIcon"        : "icon_author_xs.png",
   "email"             : "sales@plentymarkets.com",

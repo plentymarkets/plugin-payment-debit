@@ -5,6 +5,7 @@ namespace Debit\Methods;
 use Debit\Helper\DebitHelper;
 use Plenty\Modules\Account\Contact\Contracts\ContactRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
+use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
@@ -69,42 +70,35 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      * Check whether Debit is active or not
      *
      * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
      */
     public function isActive(): bool
     {
         /** @var Basket $basket */
         $basket = $this->basketRepo->load();
-        if($this->accountService->getIsAccountLoggedIn() && $basket->customerId > 0) {
+
+        if (!$this->isGuest($basket->customerId)) {
+
             /** @var ContactRepositoryContract $contactRepository */
             $contactRepository = pluginApp(ContactRepositoryContract::class);
             $contact = $contactRepository->findContactById($basket->customerId);
-            if(!is_null($contact) && $contact instanceof Contact) {
-                $allowed = $contact->allowedMethodsOfPayment->first(function($method) {
-                    if($method instanceof ContactAllowedMethodOfPayment) {
-                        if($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
-                            || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
-                            return true;
-                        }
-                    }
-                });
-                if($allowed) {
-                    return true;
+
+            if (!$this->hasActiveShippingCountry()) {
+                if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                    return false;
                 }
             }
-        }
 
-        /**
-         * Check whether the user is logged in
-         */
-        if( !$this->settings->getSetting('allowDebitForGuest') && !$this->accountService->getIsAccountLoggedIn())
-        {
-            return false;
-        }
+        } else {
 
+            if (!$this->hasActiveShippingCountry()) {
+                return false;
+            }
 
-        if(!in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries()))
-        {
-            return false;
+            if(!$this->settings->getSetting('allowDebitForGuest') && $this->isGuest($basket->customerId)) {
+                return false;
+            }
+
         }
 
         return true;
@@ -192,11 +186,80 @@ class DebitPaymentMethod extends PaymentMethodBaseService
     /**
      * Check if it is allowed to switch to this payment method
      *
+     * @param int|null $orderId
      * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
      */
-    public function isSwitchableTo(): bool
+    public function isSwitchableTo(int $orderId = null):bool
     {
-        return false;
+        if(!is_null($orderId) && $orderId > 0) {
+
+            try {
+
+                /** @var OrderRepositoryContract $orderRepo */
+                $orderRepo = pluginApp(OrderRepositoryContract::class);
+                $filters = $orderRepo->getFilters();
+                $filters['addOrderItems'] = false;
+                $orderRepo->setFilters($filters);
+
+                $order = $orderRepo->findOrderById($orderId, ['amounts', 'contactReceiver']);
+
+                $customerId = $order->contactReceiver !== null ? $order->contactReceiver->id : 0;
+
+                if (!$this->isGuest($customerId)) {
+
+                    /** @var ContactRepositoryContract $contactRepository */
+                    $contactRepository = pluginApp(ContactRepositoryContract::class);
+                    $contact = $contactRepository->findContactById($customerId);
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                            return false;
+                        }
+                    }
+
+                }
+
+            } catch(\Exception $e) {}
+
+        } else {
+
+            try {
+
+                $basketRepositoryContract = pluginApp(BasketRepositoryContract::class);
+
+                /** @var Basket $basket */
+                $basket = $basketRepositoryContract->load();
+
+                if (!$this->isGuest($basket->customerId)) {
+
+                    /** @var ContactRepositoryContract $contactRepository */
+                    $contactRepository = pluginApp(ContactRepositoryContract::class);
+                    $contact = $contactRepository->findContactById($basket->customerId);
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        if (!$this->isExplicitlyAllowedForThisCustomer($contact)) {
+                            return false;
+                        }
+                    }
+
+                } else {
+
+                    if (!$this->hasActiveShippingCountry()) {
+                        return false;
+                    }
+
+                    if( !$this->settings->getSetting('allowDebitForGuest') && $this->isGuest($basket->customerId)) {
+                        return false;
+                    }
+
+                }
+
+            } catch(\Exception $e) {}
+
+        }
+
+        return true;
     }
 
     /**
@@ -273,4 +336,52 @@ class DebitPaymentMethod extends PaymentMethodBaseService
         $icon = $app->getUrlPath('debit').'/images/logos/debit_backend_icon.svg';
         return $icon;
     }
+
+    /**
+     * @param int $customerId
+     * @return bool
+     */
+    private function isGuest($customerId)
+    {
+        return !$this->accountService->getIsAccountLoggedIn() || $customerId <= 0;
+    }
+
+    /**
+     * @param Contact $contact
+     * @return bool
+     */
+    private function isExplicitlyAllowedForThisCustomer(Contact $contact = null)
+    {
+        if (is_null($contact)) {
+            return false;
+        }
+
+        $allowed = $contact->allowedMethodsOfPayment->first(function ($method) {
+            if ($method instanceof ContactAllowedMethodOfPayment) {
+                if ($method->methodOfPaymentId == $this->debitHelper->getDebitMopId() && $method->allowed
+                    || $method->methodOfPaymentId == $this->debitHelper->getOldDebitMopId() && $method->allowed) {
+                    return true;
+                }
+            }
+        });
+
+        return $allowed ? true : false;
+
+    }
+
+    /**
+     * @return bool
+     * @throws \Plenty\Exceptions\ValidationException
+     */
+    private function hasActiveShippingCountry()
+    {
+        if (empty($this->settings->getShippingCountries()) || !in_array($this->checkout->getShippingCountryId(), $this->settings->getShippingCountries())) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+
 }

@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.11 (2020-06-18)
+
+### Fixed
+- Properly check assistant allowance configuration for guest orders.
+
 ## 1.0.10 (2020-06-10)
 
 ### Fixed
