@@ -1,4 +1,11 @@
 # Release Notes für Lastschrift
+
+## 1.0.11 (2020-06-18)
+
+### Gefixt
+- Die Prüfung ob die Zahlungsart für Gastbestellungen erlaubt ist wurde korrigiert.
+
+
 ## 1.0.10 (2020-06-10)
 
 ### Gefixt
