@@ -3,7 +3,7 @@
 ## 1.0.12
 
 ### Behoben
-- Der Link zu einer Internen Inforseite wird nun wieder korrekt angezeigt
+- Der Link zu einer internen Infoseite wird nun wieder korrekt angezeigt.
 
 ## 1.0.11
 
