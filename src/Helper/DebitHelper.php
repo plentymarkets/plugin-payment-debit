@@ -6,6 +6,7 @@ use Debit\Services\SessionStorageService;
 use Plenty\Modules\Account\Contact\Contracts\ContactPaymentRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\ContactBank;
 use Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Helper\Services\WebstoreHelper;
 use Plenty\Modules\Order\Contracts\OrderRepositoryContract;
 use Plenty\Modules\Order\Models\Order;
 use Plenty\Modules\Payment\Contracts\PaymentOrderRelationRepositoryContract;
@@ -235,5 +236,24 @@ class DebitHelper
         $paymentProperty->typeId = $typeId;
         $paymentProperty->value = $value;
         return $paymentProperty;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomain()
+    {
+        /** @var WebstoreHelper $webstoreHelper */
+        $webstoreHelper = pluginApp(WebstoreHelper::class);
+
+        /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
+        $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
+
+        $domain = $webstoreConfig->domainSsl;
+        if (strpos($domain, 'master.plentymarkets') || $domain == 'http://dbmaster.plenty-showcase.de' || $domain == 'http://dbmaster-beta7.plentymarkets.eu' || $domain == 'http://dbmaster-stable7.plentymarkets.eu') {
+            $domain = 'https://master.plentymarkets.com';
+        }
+
+        return $domain;
     }
 }
