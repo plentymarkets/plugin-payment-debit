@@ -121,9 +121,11 @@ class DebitPaymentMethod extends PaymentMethodBaseService
                     $categoryId = (int) $this->settings->getSetting('internal_info_page');
                     if($categoryId  > 0)
                     {
+                        /** @var DebitHelper $debitHelper */
+                        $debitHelper = pluginApp(DebitHelper::class);
                         /** @var CategoryRepositoryContract $categoryContract */
                         $categoryContract = pluginApp(CategoryRepositoryContract::class);
-                        return $categoryContract->getUrl($categoryId, $this->getLanguage());
+                        return $debitHelper->getDomain() . '/' . $categoryContract->getUrl($categoryId, $this->getLanguage());
                     }
                     return '';
                 case 'external':

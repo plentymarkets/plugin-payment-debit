@@ -1,7 +1,9 @@
 <?php
 
 namespace Debit\Assistants\SettingsHandlers;
+use Debit\Helper\DebitHelper;
 use Debit\Services\SettingsService;
+use Plenty\Modules\Order\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\System\Contracts\WebstoreRepositoryContract;
 use Plenty\Modules\System\Models\Webstore;
 use Plenty\Modules\Wizard\Contracts\WizardSettingsHandler;
@@ -40,6 +42,7 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
         $this->saveDebitSettings($webstoreId, $data);
         $this->saveDebitShippingCountrySettings($webstoreId, $data);
         $this->createContainer($webstoreId, $data);
+        $this->activateLegacyPaymentMethod();
 
         return true;
     }
@@ -221,5 +224,18 @@ class DebitAssistantSettingsHandler implements WizardSettingsHandler
     {
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
         return preg_match($regex, $string);
+    }
+
+    /**
+     * Activate the legacy payment method. This is needed to use the debit payment method.
+     */
+    private function activateLegacyPaymentMethod()
+    {
+        /** @var DebitHelper $debitHelper */
+        $debitHelper = pluginApp(DebitHelper::class);
+        /** @var PaymentMethodRepositoryContract $paymentMethodRepository */
+        $paymentMethodRepository = pluginApp(PaymentMethodRepositoryContract::class);
+
+        $paymentMethodRepository->activatePaymentMethod($debitHelper->getDebitMopId());
     }
 }
