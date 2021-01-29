@@ -14,6 +14,7 @@ use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
+use Plenty\Modules\System\Models\WebstoreConfiguration;
 
 /**
  * Class DebitHelper
@@ -23,6 +24,11 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 class DebitHelper
 {
     private $contactBank;
+
+    /**
+     * @var WebstoreConfiguration
+     */
+    private $webstoreConfig;
 
     /**
      * @var PaymentMethodRepositoryContract $paymentMethodRepository
@@ -243,11 +249,7 @@ class DebitHelper
      */
     public function getDomain()
     {
-        /** @var WebstoreHelper $webstoreHelper */
-        $webstoreHelper = pluginApp(WebstoreHelper::class);
-
-        /** @var \Plenty\Modules\System\Models\WebstoreConfiguration $webstoreConfig */
-        $webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
+        $webstoreConfig = $this->getWebstoreConfig();
 
         $domain = $webstoreConfig->domainSsl;
         if (strpos($domain, 'master.plentymarkets') || $domain == 'http://dbmaster.plenty-showcase.de' || $domain == 'http://dbmaster-beta7.plentymarkets.eu' || $domain == 'http://dbmaster-stable7.plentymarkets.eu') {
@@ -255,5 +257,20 @@ class DebitHelper
         }
 
         return $domain;
+    }
+
+    /**
+     * @return WebstoreConfiguration
+     */
+    public function getWebstoreConfig()
+    {
+        if ($this->webstoreConfig === null) {
+            /** @var WebstoreHelper $webstoreHelper */
+            $webstoreHelper = pluginApp(WebstoreHelper::class);
+            /** @var WebstoreConfiguration $webstoreConfig */
+            $this->webstoreConfig = $webstoreHelper->getCurrentWebstoreConfiguration();
+        }
+
+        return $this->webstoreConfig;
     }
 }

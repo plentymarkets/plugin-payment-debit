@@ -10,13 +10,13 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Account\Contact\Models\Contact;
 use Plenty\Modules\Account\Contact\Models\ContactAllowedMethodOfPayment;
 use Plenty\Modules\Basket\Models\Basket;
-use Plenty\Modules\Category\Contracts\CategoryRepositoryContract;
 use Plenty\Modules\Frontend\Contracts\Checkout;
 use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 use Plenty\Modules\Payment\Method\Services\PaymentMethodBaseService;
 use Plenty\Plugin\Application;
 use Debit\Services\SettingsService;
 use Plenty\Plugin\Translation\Translator;
+use Plenty\Modules\Webshop\Contracts\UrlBuilderRepositoryContract;
 
 /**
  * Class DebitPaymentMethod
@@ -123,9 +123,17 @@ class DebitPaymentMethod extends PaymentMethodBaseService
                     {
                         /** @var DebitHelper $debitHelper */
                         $debitHelper = pluginApp(DebitHelper::class);
-                        /** @var CategoryRepositoryContract $categoryContract */
-                        $categoryContract = pluginApp(CategoryRepositoryContract::class);
-                        return $debitHelper->getDomain() . '/' . $categoryContract->getUrl($categoryId, $this->getLanguage());
+                        $urlBuilderRepository = pluginApp(UrlBuilderRepositoryContract::class);
+
+                        $urlQuery = $urlBuilderRepository->buildCategoryUrl($categoryId, $lang);
+
+                        $defaultLanguage = $debitHelper->getWebstoreConfig()->defaultLanguage;
+                        $includeLanguage = false;
+                        if ($lang != $defaultLanguage) {
+                            $includeLanguage = true;
+                        }
+
+                        return $debitHelper->getDomain() . $urlQuery->toRelativeUrl($includeLanguage);
                     }
                     return '';
                 case 'external':
