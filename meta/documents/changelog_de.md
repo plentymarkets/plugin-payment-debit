@@ -1,5 +1,10 @@
 # Release Notes für Lastschrift
 
+## 1.0.13
+
+### Behoben
+- Die URL der internen Infoseite wird nun für Fremdsprachen korrekt erzeugt.
+
 ## 1.0.12
 
 ### Behoben
