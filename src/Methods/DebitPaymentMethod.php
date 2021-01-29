@@ -113,6 +113,9 @@ class DebitPaymentMethod extends PaymentMethodBaseService
     public function getSourceUrl(string $lang = 'de'): string
     {
         if ($this->settings->getSetting('info_page_toggle')) {
+
+            $lang = $this->getLanguage();
+            
             $infoPageType = $this->settings->getSetting('info_page_type');
 
             switch ($infoPageType)
