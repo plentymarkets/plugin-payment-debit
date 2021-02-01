@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.13
+
+### Fixed
+- The URL for the internal info page is now generated correctly.
+
 ## 1.0.12
 
 ### Fixed
