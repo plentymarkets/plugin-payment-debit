@@ -73,7 +73,7 @@ class DebitController extends Controller
             $bankAccount['bankId']		     =	$contactBank->id;
             $bankAccount['debitMandate']	 =	($contactBank->directDebitMandateAvailable ? 'checked' : '');
         }
-
+        echo('test');
         return $twig->render('Debit::BankDetailsOverlay', [
             "action"            => "/rest/payment/debit/updateBankDetails",
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
