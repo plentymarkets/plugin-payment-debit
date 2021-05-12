@@ -15,6 +15,7 @@ use Plenty\Modules\Payment\Method\Contracts\PaymentMethodRepositoryContract;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
+use Plenty\Plugin\Log\Loggable;
 
 /**
  * Class DebitHelper
@@ -23,6 +24,8 @@ use Plenty\Modules\System\Models\WebstoreConfiguration;
  */
 class DebitHelper
 {
+    use Loggable;
+
     private $contactBank;
 
     /**
@@ -106,10 +109,30 @@ class DebitHelper
      *
      * @param int $orderId
      * @param ContactBank $contactBank
-     * @return Payment
+     * @return Payment|boolean
      */
     public function createPlentyPayment($orderId, $contactBank)
     {
+        /** @var PaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(PaymentRepositoryContract::class);
+        $orderPayment = $paymentRepo->getPaymentsByOrderId($orderId);
+        if(isset($orderPayment) || is_countable($orderPayment)) {
+            // There is already a payment assigned to the order so we don't need to create an other one.
+            return false;
+        }
+
+        /** @var OrderRepositoryContract $orderRepository */
+        $orderRepository = pluginApp(OrderRepositoryContract::class);
+        try {
+            $order = $orderRepository->findById($orderId);
+        } catch (\Exception $exception) {
+            //The order doesn't exists so we don't need to create an payment
+            $this->getLogger('DEBIT')->error('Order not found', [
+                'orderId' => $orderId
+            ]);
+            return false;
+        }
+
         /** @var Payment $payment */
         $payment = pluginApp(Payment::class);
 
@@ -118,6 +141,9 @@ class DebitHelper
         $payment->status            = Payment::STATUS_APPROVED;
         $payment->unaccountable     = 1;
         $payment->regenerateHash    = true;
+        $payment->amount            = $order->amount->invoiceTotal;
+        $payment->currency          = $order->amount->currency;
+        $payment->isSystemCurrency  = $order->amount->isSystemCurrency;
 
         $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_TRANSACTION_ID, $orderId);
         $paymentProperties[] = $this->createPaymentProperty(PaymentProperty::TYPE_IBAN_OF_SENDER, $contactBank->iban);

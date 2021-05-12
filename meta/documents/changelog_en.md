@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.14
+
+### Fixed
+- The payment with the necessary bank data is now created with the correct amount and currency.
+
 ## 1.0.13
 
 ### Fixed
