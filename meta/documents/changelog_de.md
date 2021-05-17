@@ -3,7 +3,7 @@
 ## 1.0.14
 
 ### Behoben
-- Die Zahlung mit dem notwendigen Bankdaten wird nun mit dem korrekten Betrag und der Währung angelegt.
+- Die Zahlung mit den notwendigen Bankdaten wird nun mit dem korrekten Betrag und der Währung angelegt.
 
 ## 1.0.13
 
