@@ -141,7 +141,7 @@ class DebitHelper
         $payment->status            = Payment::STATUS_APPROVED;
         $payment->unaccountable     = 1;
         $payment->regenerateHash    = true;
-        $payment->amount            = $order->amount->invoiceTotal;
+        $payment->amount            = $order->amount->invoiceTotal - $order->amount->giftCardAmount;
         $payment->currency          = $order->amount->currency;
         $payment->isSystemCurrency  = $order->amount->isSystemCurrency;
 
