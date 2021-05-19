@@ -116,7 +116,7 @@ class DebitHelper
         /** @var PaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(PaymentRepositoryContract::class);
         $orderPayment = $paymentRepo->getPaymentsByOrderId($orderId);
-        if(isset($orderPayment) || is_countable($orderPayment)) {
+        if(isset($orderPayment) || count($orderPayment) > 0) {
             // There is already a payment assigned to the order so we don't need to create an other one.
             return false;
         }
