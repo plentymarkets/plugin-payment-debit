@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.15
+
+### Fixed
+- visibility of the checkbox in the bank details overlay when you use the plentyShop LTS Modern Theme
+
 ## 1.0.14
 
 ### Fixed
