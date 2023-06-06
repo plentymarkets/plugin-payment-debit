@@ -1,5 +1,10 @@
 # Release Notes für Lastschrift
 
+## 1.0.15
+
+### Behoben
+- Die Checkbox im Bankdaten-Formular war bei Verwendung des plentyShop LTS Modern Theme unsichtbar. Dies wurde behoben
+
 ## 1.0.14
 
 ### Behoben
