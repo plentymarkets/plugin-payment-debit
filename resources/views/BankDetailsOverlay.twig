@@ -21,14 +21,14 @@
 			</div>
 
             <div class="modal-body form-horizontal row">
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div class="input-unit">
                         <label :for="bankAccountOwner">{{ trans("Debit::PaymentMethod.bankAccountOwner") }} *</label>
                         <input type="text" name="bankAccountOwner" value="{{ bankAccountOwner }}" required="required">
                     </div>
                 </div>
 
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankName">{{ trans("Debit::PaymentMethod.bankName") }}</label>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
 
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankIban">{{ trans("Debit::PaymentMethod.bankIban") }} *</label>
@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div class="input-group">
                         <div class="input-unit">
                             <label :for="bankBic">{{ trans("Debit::PaymentMethod.bankBic") }} *</label>
@@ -55,9 +55,9 @@
                     </div>
                 </div>
 
-                <div class="col-xs-12">
+                <div class="col-12">
                     <div class="form-check">
-                        <label class="form-check-label"><input type="checkbox" class="form-check-input" name="debitMandate" {{ debitMandate }} required="required">* {{ trans("Debit::PaymentMethod.paymentMethodDebitMandate") }}</label>
+                        <label class="form-check-label"><input type="checkbox" class="form-check-input visible" name="debitMandate" {{ debitMandate }} required="required">* {{ trans("Debit::PaymentMethod.paymentMethodDebitMandate") }}</label>
                     </div>
                 </div>
             </div>
