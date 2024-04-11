@@ -164,7 +164,7 @@ class DebitController extends Controller
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
 
-            return $response->redirectTo($this->sessionStorageService->getLang() . '/place-order');
+            return $response->redirectTo($this->sessionStorageService->getLang() . '/place-order-here');
         } catch (\Exception $e) {
             return $response->redirectTo($this->sessionStorageService->getLang() . '/checkout');
         }
