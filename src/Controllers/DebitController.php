@@ -12,12 +12,15 @@ use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Plugin\Controller;
+use Plenty\Plugin\Log\Loggable;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
 
 class DebitController extends Controller
 {
+    use Loggable;
+
     /**
      * @var SessionStorageService $sessionStorageService
      */
@@ -33,7 +36,7 @@ class DebitController extends Controller
         $this->accountService = $accountService;
     }
 
-    public function getBankDetails( Twig $twig, $orderId)
+    public function getBankDetails(Twig $twig, $orderId)
     {
         /** @var ContactPaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
@@ -47,7 +50,7 @@ class DebitController extends Controller
 
         if (is_null($contactBank)) {
             $accountContactId = $this->accountService->getAccountContactId();
-            if($accountContactId>0) {
+            if ($accountContactId > 0) {
                 /** @var ContactRepositoryContract $contactRepository */
                 $contactRepository = pluginApp(ContactRepositoryContract::class);
                 $contact = $authHelper->processUnguarded(function () use ($contactRepository, $accountContactId) {
@@ -55,34 +58,33 @@ class DebitController extends Controller
                 });
 
                 $bank = $contact->banks->last();
-                if($bank instanceof ContactBank)
-                {
-                    $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
-                    $bankAccount['bankName']         =	$bank->bankName;
-                    $bankAccount['bankIban']	     =	$bank->iban;
-                    $bankAccount['bankBic']		     =	$bank->bic;
-                    $bankAccount['bankId']		     =	0;
-                    $bankAccount['debitMandate']	 =	'';
+                if ($bank instanceof ContactBank) {
+                    $bankAccount['bankAccountOwner'] = $bank->accountOwner;
+                    $bankAccount['bankName'] = $bank->bankName;
+                    $bankAccount['bankIban'] = $bank->iban;
+                    $bankAccount['bankBic'] = $bank->bic;
+                    $bankAccount['bankId'] = 0;
+                    $bankAccount['debitMandate'] = '';
                 }
             }
         } else {
-            $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
-            $bankAccount['bankName']         =	$contactBank->bankName;
-            $bankAccount['bankIban']	     =	$contactBank->iban;
-            $bankAccount['bankBic']		     =	$contactBank->bic;
-            $bankAccount['bankId']		     =	$contactBank->id;
-            $bankAccount['debitMandate']	 =	($contactBank->directDebitMandateAvailable ? 'checked' : '');
+            $bankAccount['bankAccountOwner'] = $contactBank->accountOwner;
+            $bankAccount['bankName'] = $contactBank->bankName;
+            $bankAccount['bankIban'] = $contactBank->iban;
+            $bankAccount['bankBic'] = $contactBank->bic;
+            $bankAccount['bankId'] = $contactBank->id;
+            $bankAccount['debitMandate'] = ($contactBank->directDebitMandateAvailable ? 'checked' : '');
         }
 
         return $twig->render('Debit::BankDetailsOverlay', [
-            "action"            => "/rest/payment/debit/updateBankDetails",
-            "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
-            "bankName"          => $bankAccount['bankName'],
-            "bankIban"          => $bankAccount['bankIban'],
-            "bankBic"           => $bankAccount['bankBic'],
-            "bankId"            => $bankAccount['bankId'],
-            "debitMandate"      => ($bankAccount['debitMandate'] ? 'checked' : ''),
-            "orderId"           => $orderId,
+            "action" => "/rest/payment/debit/updateBankDetails",
+            "bankAccountOwner" => $bankAccount['bankAccountOwner'],
+            "bankName" => $bankAccount['bankName'],
+            "bankIban" => $bankAccount['bankIban'],
+            "bankBic" => $bankAccount['bankBic'],
+            "bankId" => $bankAccount['bankId'],
+            "debitMandate" => ($bankAccount['debitMandate'] ? 'checked' : ''),
+            "orderId" => $orderId,
         ]);
     }
 
@@ -92,33 +94,42 @@ class DebitController extends Controller
      */
     public function setBankDetails(Response $response, Request $request)
     {
+        $log = [];
+
         /** @var BasketRepositoryContract $basketRepo */
         $basketRepo = pluginApp(BasketRepositoryContract::class);
         $basket = $basketRepo->load();
 
         $bankData = [
-            'contactId'     => $basket->customerId,
-            'accountOwner'  => $request->get('bankAccountOwner'),
-            'bankName'      => $request->get('bankName'),
-            'iban'          => $request->get('bankIban'),
-            'bic'           => $request->get('bankBic'),
-            'lastUpdateBy'  => 'customer'
+            'contactId' => $basket->customerId,
+            'accountOwner' => $request->get('bankAccountOwner'),
+            'bankName' => $request->get('bankName'),
+            'iban' => $request->get('bankIban'),
+            'bic' => $request->get('bankBic'),
+            'lastUpdateBy' => 'customer'
         ];
 
-        try
-        {
+        $log["back_details_1"] = $bankData;
+
+        try {
             //check if this contactBank already exist
             $contactBankExists = false;
-            if ($bankData['contactId'] != NULL) {
+            if ($bankData['contactId'] != null) {
+                $log['contactId_not_null'] = true;
+
                 /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
 
                 /** @var ContactPaymentRepositoryContract $paymentRepo */
                 $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
-                $contactBankExists = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-                    $contactBanks = $paymentRepo->getBanksOfContact($bankData['contactId'], ['contactId', 'accountOwner', 'bankName', 'iban', 'bic']);
+                $contactBankExists = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData, $log) {
+                    $contactBanks = $paymentRepo->getBanksOfContact(
+                        $bankData['contactId'],
+                        ['contactId', 'accountOwner', 'bankName', 'iban', 'bic']
+                    );
                     foreach ($contactBanks as $contactBank) {
-                        if ($contactBank->contactId == $bankData['contactId']
+                        if (
+                            $contactBank->contactId == $bankData['contactId']
                             && $contactBank->accountOwner == $bankData['accountOwner']
                             && $contactBank->bankName == $bankData['bankName']
                             && $contactBank->iban == $bankData['iban']
@@ -131,6 +142,8 @@ class DebitController extends Controller
                 });
             }
 
+            $log['contact_back_exists'] = $contactBankExists;
+
             $bankData['lastUpdateBy'] = 'customer';
             if (!$contactBankExists) {
                 $this->createContactBank($bankData);
@@ -141,13 +154,19 @@ class DebitController extends Controller
             $bankData['paymentMethod'] = 'onOff';
             $contactBank = $this->createContactBank($bankData);
 
+            try {
+                $log['contactBank'] = $contactBank->toArray();
+            } catch (\Exception $e) {
+                $log['contactBank'] = $contactBank;
+            }
+
+            $this->getLogger('direct_debit_debug')->error('direct_debit_debug', $log);
+
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
 
-            return $response->redirectTo($this->sessionStorageService->getLang().'/place-order');
-        }
-        catch(\Exception $e)
-        {
-            return $response->redirectTo($this->sessionStorageService->getLang().'/checkout');
+            return $response->redirectTo($this->sessionStorageService->getLang() . '/place-order');
+        } catch (\Exception $e) {
+            return $response->redirectTo($this->sessionStorageService->getLang() . '/checkout');
         }
     }
 
@@ -155,16 +174,32 @@ class DebitController extends Controller
      *
      * @return BaseResponse
      */
+
+    private function createContactBank($bankData)
+    {
+        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
+        $authHelper = pluginApp(AuthHelper::class);
+
+        /** @var ContactPaymentRepositoryContract $paymentRepo */
+        $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
+
+        $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
+            return $paymentRepo->createContactBank($bankData);
+        });
+
+        return $contactBank;
+    }
+
     public function updateBankDetails(Response $response, Request $request)
     {
         $orderId = $request->get('orderId');
         $bankData = [
-            'accountOwner'  => $request->get('bankAccountOwner'),
-            'bankName'      => $request->get('bankName'),
-            'iban'          => $request->get('bankIban'),
-            'bic'           => $request->get('bankBic'),
-            'lastUpdateBy'  => 'customer',
-            'orderId'       => $orderId
+            'accountOwner' => $request->get('bankAccountOwner'),
+            'bankName' => $request->get('bankName'),
+            'iban' => $request->get('bankIban'),
+            'bic' => $request->get('bankBic'),
+            'lastUpdateBy' => 'customer',
+            'orderId' => $orderId
         ];
         if ($request->has('bankId') && $request->get('bankId') > 0) {
             //update existing bankaccount
@@ -180,29 +215,16 @@ class DebitController extends Controller
         // Create a plentymarkets payment
         $plentyPayment = $debitHelper->createPlentyPayment($orderId, $contactBank);
 
-        if($plentyPayment instanceof Payment) {
+        if ($plentyPayment instanceof Payment) {
             // Assign the payment to an order in plentymarkets
             $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
         }
 
-        return $response->redirectTo($this->sessionStorageService->getLang().'/confirmation/'.$orderId);
+        return $response->redirectTo($this->sessionStorageService->getLang() . '/confirmation/' . $orderId);
     }
 
-    private function createContactBank($bankData) {
-        /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
-        $authHelper = pluginApp(AuthHelper::class);
-
-        /** @var ContactPaymentRepositoryContract $paymentRepo */
-        $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
-
-        $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-            return $paymentRepo->createContactBank($bankData);
-        });
-
-        return $contactBank;
-    }
-
-    private function updateContactBank($bankData) {
+    private function updateContactBank($bankData)
+    {
         /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
