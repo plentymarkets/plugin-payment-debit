@@ -15,9 +15,11 @@ use Plenty\Plugin\Controller;
 use Plenty\Plugin\Templates\Twig;
 use Plenty\Plugin\Http\Response;
 use Plenty\Plugin\Http\Request;
+use Plenty\Plugin\Log\Loggable;
 
 class DebitController extends Controller
 {
+    use Loggable;
     /**
      * @var SessionStorageService $sessionStorageService
      */
@@ -110,6 +112,7 @@ class DebitController extends Controller
             //check if this contactBank already exist
             $contactBankExists = false;
             if ($bankData['contactId'] != NULL) {
+                $this->getLogger(__METHOD__)->debug('Check if this contactBank already exist', $bankData);
                 /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
 
@@ -124,16 +127,21 @@ class DebitController extends Controller
                             && $contactBank->iban == $bankData['iban']
                             && $contactBank->bic == $bankData['bic']
                         ) {
+                            $this->getLogger(__METHOD__)->debug('Contact bank was found', $bankData);
                             return true;
                         }
                     }
+                    $this->getLogger(__METHOD__)->debug('Contact bank was Not found', $bankData);
                     return false;
                 });
             }
 
             $bankData['lastUpdateBy'] = 'customer';
             if (!$contactBankExists) {
-                $this->createContactBank($bankData);
+                $this->getLogger(__METHOD__)->debug('Contact bank will be created', $bankData);
+                /** @var ContactBank $newContactBank */
+                $newContactBank = $this->createContactBank($bankData);
+                $this->getLogger(__METHOD__)->debug('Contact bank was created successfully', $newContactBank);
             }
             $bankData['contactId'] = null;
             $bankData['directDebitMandateAvailable'] = 1;
@@ -143,10 +151,11 @@ class DebitController extends Controller
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
 
-            return $response->redirectTo($this->sessionStorageService->getLang().'/place-order');
+            return $response->redirectTo($this->sessionStorageService->getLang() . '/place-order');
         }
         catch(\Exception $e)
         {
+            $this->getLogger(__METHOD__)->error('Exception in contact bank processing', $e->getMessage());
             return $response->redirectTo($this->sessionStorageService->getLang().'/checkout');
         }
     }
@@ -188,6 +197,11 @@ class DebitController extends Controller
         return $response->redirectTo($this->sessionStorageService->getLang().'/confirmation/'.$orderId);
     }
 
+
+    /**
+     * @param $bankData
+     * @return mixed
+     */
     private function createContactBank($bankData) {
         /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
@@ -196,9 +210,14 @@ class DebitController extends Controller
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
 
         $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-            return $paymentRepo->createContactBank($bankData);
+            $this->getLogger(__METHOD__)->debug('Create contact bank', $bankData);
+            /** @var ContactBank $newContactBank */
+            $newContactBank = $paymentRepo->createContactBank($bankData);
+            $this->getLogger(__METHOD__)->debug('Created contact bank', $newContactBank);
+            return $newContactBank;
         });
 
+        $this->getLogger(__METHOD__)->debug('Contact bank not created, return contact bank', $contactBank);
         return $contactBank;
     }
 
