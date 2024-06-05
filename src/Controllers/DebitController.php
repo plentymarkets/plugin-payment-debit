@@ -112,7 +112,7 @@ class DebitController extends Controller
             //check if this contactBank already exist
             $contactBankExists = false;
             if ($bankData['contactId'] != NULL) {
-                $this->getLogger(__METHOD__)->debug('Check if this contactBank already exist', $bankData);
+                $this->getLogger(__METHOD__)->error('Check if this contactBank already exist', $bankData);
                 /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
 
@@ -127,21 +127,21 @@ class DebitController extends Controller
                             && $contactBank->iban == $bankData['iban']
                             && $contactBank->bic == $bankData['bic']
                         ) {
-                            $this->getLogger(__METHOD__)->debug('Contact bank was found', $bankData);
+                            $this->getLogger(__METHOD__)->error('Contact bank was found', $bankData);
                             return true;
                         }
                     }
-                    $this->getLogger(__METHOD__)->debug('Contact bank was Not found', $bankData);
+                    $this->getLogger(__METHOD__)->error('Contact bank was Not found', $bankData);
                     return false;
                 });
             }
 
             $bankData['lastUpdateBy'] = 'customer';
             if (!$contactBankExists) {
-                $this->getLogger(__METHOD__)->debug('Contact bank will be created', $bankData);
+                $this->getLogger(__METHOD__)->error('Contact bank will be created', $bankData);
                 /** @var ContactBank $newContactBank */
                 $newContactBank = $this->createContactBank($bankData);
-                $this->getLogger(__METHOD__)->debug('Contact bank was created successfully', $newContactBank);
+                $this->getLogger(__METHOD__)->error('Contact bank was created successfully', $newContactBank);
             }
             $bankData['contactId'] = null;
             $bankData['directDebitMandateAvailable'] = 1;
@@ -210,14 +210,14 @@ class DebitController extends Controller
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
 
         $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-            $this->getLogger(__METHOD__)->debug('Create contact bank', $bankData);
+            $this->getLogger(__METHOD__)->error('Create contact bank', $bankData);
             /** @var ContactBank $newContactBank */
             $newContactBank = $paymentRepo->createContactBank($bankData);
-            $this->getLogger(__METHOD__)->debug('Created contact bank', $newContactBank);
+            $this->getLogger(__METHOD__)->error('Created contact bank', $newContactBank);
             return $newContactBank;
         });
 
-        $this->getLogger(__METHOD__)->debug('Contact bank not created, return contact bank', $contactBank);
+        $this->getLogger(__METHOD__)->error('Contact bank not created, return contact bank', $contactBank);
         return $contactBank;
     }
 
