@@ -110,7 +110,7 @@ class DebitController extends Controller
         $logs['step05-RedenderBankDetailsDesc'] = 'Render successfully BankDetailsOverlay';
         $logs['step05-LastBankForContactData']['contactBank'] = $bankAccount;
         $logs['step05-LastBankForContactData']['orderId'] = $orderId;
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Render successfully BankDetailsOverlay', $bankAccount);
+        //$this->getLogger(PluginConstants::PLUGIN_NAME)->error('Render successfully BankDetailsOverlay', $bankAccount);
 
         $this->debitHelper->logQueueDebit($logs, $orderId);
         return $twig->render('Debit::BankDetailsOverlay', [

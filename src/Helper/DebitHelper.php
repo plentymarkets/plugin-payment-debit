@@ -306,20 +306,12 @@ class DebitHelper
             if (isset($log['contactBank'])) {
                 $replacement = '****';
                 if (is_array($log['contactBank'])) {
-                    foreach ($log['contactBank'] as $key => $value) {
-                        if ($key == 'bankIban') {
-                            $log['contactBank']['bankIban'] = $replacement;
-                        } elseif ($key == 'bankBic') {
-                            $log['contactBank']['bankBic'] = $replacement;
-                        }
-                    }
+                    $log['contactBank']['bankIban'] = $replacement;
+                    $log['contactBank']['bankBic'] = $replacement;
                 } else {
-                    if (isset($log['contactBank']->iban)) {
-                        $log['contactBank']->iban = $replacement;
-                    }
-                    if (isset($log['contactBank']->bic)) {
-                        $log['contactBank']->bic = $replacement;
-                    }
+                    $log['contactBank']->iban = $replacement;
+
+                    $log['contactBank']->bic = $replacement;
                 }
             }
         }
