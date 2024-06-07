@@ -307,10 +307,11 @@ class DebitHelper
                 $replacement = '****';
                 if (is_array($log['contactBank'])) {
                     $log['contactBank']['bankIban'] = $replacement;
+                    $log['contactBank']['iban'] = $replacement;
                     $log['contactBank']['bankBic'] = $replacement;
+                    $log['contactBank']['bic'] = $replacement;
                 } else {
                     $log['contactBank']->iban = $replacement;
-
                     $log['contactBank']->bic = $replacement;
                 }
             }
