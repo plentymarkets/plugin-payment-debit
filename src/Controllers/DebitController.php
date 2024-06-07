@@ -93,8 +93,8 @@ class DebitController extends Controller
                 }
             }
         } else {
-            $logs['step04-LastBankForContactDesc'] = 'Use bank details from order constact';
-            $logs['step04-LastBankForContactData']['orderId'] = $orderId;
+            $logs['step05-UseBankFromOrderDesc'] = 'Use bank details from order contact';
+            $logs['step05-UseBankFromOrderData']['orderId'] = $orderId;
 
 
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
@@ -103,16 +103,15 @@ class DebitController extends Controller
             $bankAccount['bankBic']		     =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
             $bankAccount['debitMandate']	 =	($contactBank->directDebitMandateAvailable ? 'checked' : '');
-            $logs['step04-LastBankForContactData']['contactBank'] = $bankAccount;
+            $logs['step05-UseBankFromOrderData']['contactBank'] = $bankAccount;
 
         }
 
-        $logs['step05-RedenderBankDetailsDesc'] = 'Render successfully BankDetailsOverlay';
-        $logs['step05-LastBankForContactData']['contactBank'] = $bankAccount;
-        $logs['step05-LastBankForContactData']['orderId'] = $orderId;
-        //$this->getLogger(PluginConstants::PLUGIN_NAME)->error('Render successfully BankDetailsOverlay', $bankAccount);
-
+        $logs['step06-RedenderBankDetailsDesc'] = 'Render successfully BankDetailsOverlay';
+        $logs['step06-RedenderBankDetailsData']['contactBank'] = $bankAccount;
+        $logs['step06-RedenderBankDetailsData']['orderId'] = $orderId;
         $this->debitHelper->logQueueDebit($logs, $orderId);
+
         return $twig->render('Debit::BankDetailsOverlay', [
             "action"            => "/rest/payment/debit/updateBankDetails",
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
