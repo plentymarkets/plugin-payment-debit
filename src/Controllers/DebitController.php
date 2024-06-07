@@ -29,19 +29,27 @@ class DebitController extends Controller
      * @var AccountService $accountService
      */
     private $accountService;
+    /**
+     * @var DebitHelper $debitHelper
+     */
+    private $debitHelper;
 
-    public function __construct(AccountService $accountService, SessionStorageService $sessionStorageService)
-    {
+    public function __construct(
+        AccountService $accountService,
+        SessionStorageService $sessionStorageService,
+        DebitHelper $debitHelper
+    ) {
         $this->sessionStorageService = $sessionStorageService;
         $this->accountService = $accountService;
+        $this->debitHelper = $debitHelper;
     }
 
     public function getBankDetails( Twig $twig, $orderId)
     {
+        $logs = [];
+        $logs['step0-GetBankDetailsDesc'] = 'Get bank details for order';
+        $logs['step0-GetBankDetailsData']['orderId'] = $orderId;
 
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->critical('Get bank details for order ', $orderId);
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->info('Get bank details for order ', $orderId);
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->debug('Get bank details for order ', $orderId);
         /** @var ContactPaymentRepositoryContract $paymentRepo */
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
 
@@ -51,12 +59,18 @@ class DebitController extends Controller
         $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $orderId) {
             return $paymentRepo->getBankByOrderId($orderId);
         });
+        $logs['step01-FoundBankDetailsDesc'] = 'Contact bank for orderId ';
+        $logs['step01-FoundBankDetailsData']['orderId'] = $orderId;
+        $logs['step01-FoundBankDetailsData']['contactBank'] = $contactBank;
 
         if (is_null($contactBank)) {
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Search for contact bank without orderId');
+            $logs['step02-NotFoundContactBankDesc'] = 'Contact bank for orderId not found. Search for contact bank without orderId';
+            $logs['step02-NotFoundContactBankData']['orderId'] = $orderId;
             $accountContactId = $this->accountService->getAccountContactId();
             if($accountContactId>0) {
-                $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Search bank details by contactId ', $accountContactId);
+                $logs['step03-SearchByContactIdDesc'] = 'Search bank details by contactId';
+                $logs['step03-SearchByContactIdData']['orderId'] = $orderId;
+                $logs['step03-SearchByContactIdData']['accountContactId'] = $accountContactId;
                 /** @var ContactRepositoryContract $contactRepository */
                 $contactRepository = pluginApp(ContactRepositoryContract::class);
                 $contact = $authHelper->processUnguarded(function () use ($contactRepository, $accountContactId) {
@@ -66,26 +80,39 @@ class DebitController extends Controller
                 $bank = $contact->banks->last();
                 if($bank instanceof ContactBank)
                 {
-                    $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Use last bank of found contact ', $bank);
+                    $logs['step04-LastBankForContactDesc'] = 'Use last bank of found contact';
+                    $logs['step04-LastBankForContactData']['orderId'] = $orderId;
+
                     $bankAccount['bankAccountOwner'] =  $bank->accountOwner;
                     $bankAccount['bankName']         =	$bank->bankName;
                     $bankAccount['bankIban']	     =	$bank->iban;
                     $bankAccount['bankBic']		     =	$bank->bic;
                     $bankAccount['bankId']		     =	0;
                     $bankAccount['debitMandate']	 =	'';
+                    $logs['step04-LastBankForContactData']['contactBank'] = $bankAccount;
                 }
             }
         } else {
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('use bank details from order ', $orderId);
+            $logs['step04-LastBankForContactDesc'] = 'Use bank details from order constact';
+            $logs['step04-LastBankForContactData']['orderId'] = $orderId;
+
+
             $bankAccount['bankAccountOwner'] =  $contactBank->accountOwner;
             $bankAccount['bankName']         =	$contactBank->bankName;
             $bankAccount['bankIban']	     =	$contactBank->iban;
             $bankAccount['bankBic']		     =	$contactBank->bic;
             $bankAccount['bankId']		     =	$contactBank->id;
             $bankAccount['debitMandate']	 =	($contactBank->directDebitMandateAvailable ? 'checked' : '');
+            $logs['step04-LastBankForContactData']['contactBank'] = $bankAccount;
+
         }
 
+        $logs['step05-RedenderBankDetailsDesc'] = 'Render successfully BankDetailsOverlay';
+        $logs['step05-LastBankForContactData']['bankAccount'] = $bankAccount;
+        $logs['step05-LastBankForContactData']['orderId'] = $orderId;
         $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Render successfully BankDetailsOverlay', $bankAccount);
+
+        $this->debitHelper->logQueueDebit($logs, $orderId);
         return $twig->render('Debit::BankDetailsOverlay', [
             "action"            => "/rest/payment/debit/updateBankDetails",
             "bankAccountOwner"  => $bankAccount['bankAccountOwner'],
@@ -97,6 +124,7 @@ class DebitController extends Controller
             "orderId"           => $orderId,
         ]);
     }
+
 
     /*
      *

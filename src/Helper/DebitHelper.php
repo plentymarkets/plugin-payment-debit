@@ -299,4 +299,32 @@ class DebitHelper
 
         return $this->webstoreConfig;
     }
+    
+    public function logQueueDebit(array $logs, int $orderId)
+    {
+        foreach ($logs as $log) {
+            if (isset($log['contactBank'])) {
+                $replacement = '****';
+                if (is_array($log['contactBank'])) {
+                    foreach ($log['contactBank'] as $key => $value) {
+                        if ($key == 'iban') {
+                            $log['contactBank']['iban'] = $replacement;
+                        } elseif ($key == 'bic') {
+                            $log['contactBank']['bic'] = $replacement;
+                        }
+                    }
+                } else {
+                    if (isset($log['contactBank']->iban)) {
+                        $log['contactBank']->iban = $replacement;
+                    }
+                    if (isset($log['contactBank']->bic)) {
+                        $log['contactBank']->bic = $replacement;
+                    }
+                }
+            }
+        }
+        $this->getLogger(PluginConstants::PLUGIN_NAME)
+            ->addReference('orderId', $orderId)
+            ->debug('Checked for Debit operations - Result', $logs);
+    }
 }
