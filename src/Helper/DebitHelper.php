@@ -314,11 +314,11 @@ class DebitHelper
                         }
                     }
                 } else {
-                    if (isset($log['contactBank']->iban)) {
-                        $log['contactBank']->iban = $replacement;
+                    if (isset($log['contactBank']->bankIban)) {
+                        $log['contactBank']->bankIban = $replacement;
                     }
-                    if (isset($log['contactBank']->bic)) {
-                        $log['contactBank']->bic = $replacement;
+                    if (isset($log['contactBank']->bankBic)) {
+                        $log['contactBank']->bankBic = $replacement;
                     }
                 }
             }
