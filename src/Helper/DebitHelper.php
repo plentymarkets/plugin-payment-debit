@@ -313,6 +313,8 @@ class DebitHelper
                 } else {
                     $log['contactBank']->iban = $replacement;
                     $log['contactBank']->bic = $replacement;
+                    $log['contactBank']->bankIban = $replacement;
+                    $log['contactBank']->bankBic = $replacement;
                 }
             }
         }
