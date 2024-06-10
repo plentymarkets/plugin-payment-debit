@@ -330,7 +330,9 @@ class DebitHelper
                         if (isset($logDataElem->iban)){
                             $logDataElem->iban = $replacement;
                         }
-                        $logDataElem->bic = $replacement;
+                        if (isset($logDataElem->bic)) {
+                            $logDataElem->bic = $replacement;
+                        }
                     }
 
                 }
