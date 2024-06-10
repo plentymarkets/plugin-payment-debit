@@ -309,26 +309,17 @@ class DebitHelper
     public function logQueueDebit(array $logs, int $orderId = null)
     {
         $replacement = '****';
-        foreach ($logs as $log) {
+        foreach ($logs as $step => $log) {
             if (is_array($log)) {
-                foreach ($log as $logData) {
+                foreach ($log as $key => $logData) {
                     if (is_array($logData)) {
-                        foreach ($logData as $k=>$logDataElem) {
-                            if (is_array($logDataElem)){
-                                foreach ($logDataElem as $key=>$value ){
-                                    if(in_array($key, ['iban', 'bic'])){
-                                       $logDataElem[$key] = $replacement;
-                                    }
-                                }
-                                if(in_array($k, ['iban', 'bic'])){
-                                    $logData[$k] = $replacement;
-                                }
+                        foreach ($logData as $k => $logDataElem) {
+                            if (in_array($k, ['iban', 'bic', 'bankBic', 'bankIban'])) {
+                                $logs[$step][$key][$k] = $replacement;
                             }
                         }
-                    }
-                    elseif($logData instanceof ContactBank){
-                        //instance of ContactBank
-                        if (isset($logData->iban)){
+                    } elseif ($logData instanceof ContactBank) {
+                        if (isset($logData->iban)) {
                             $logData->iban = $replacement;
                         }
                         if (isset($logData->bic)) {
@@ -338,6 +329,7 @@ class DebitHelper
                 }
             }
         }
+
         $this->getLogger(PluginConstants::PLUGIN_NAME)
             ->addReference('orderId', $orderId)
             ->error('Checked for Debit operations - Result', $logs);
