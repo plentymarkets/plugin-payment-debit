@@ -321,7 +321,7 @@ class DebitHelper
                                     }
                                 }
                                 if (stripos($k, 'iban') !== false || stripos($k, 'bic') !== false) {
-                                    $logDataElem[$k] = $replacement;
+                                    $logData[$k] = $replacement;
                                 }
                             }
                         }
