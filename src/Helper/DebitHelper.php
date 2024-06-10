@@ -321,12 +321,13 @@ class DebitHelper
                                     }
                                 }
                             }
-                            elseif($logDataElem instanceof ContactBank){
-                                //instance of ContactBank
-                                $logDataElem->iban = $replacement;
-                                $logDataElem->bic = $replacement;
-                            }
+
                         }
+                    }
+                    elseif($logDataElem instanceof ContactBank){
+                        //instance of ContactBank
+                        $logDataElem->iban = $replacement;
+                        $logDataElem->bic = $replacement;
                     }
 
                 }
