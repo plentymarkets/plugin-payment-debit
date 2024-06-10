@@ -17,6 +17,8 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Log\Loggable;
 
+use function Termwind\ValueObjects\truncate;
+
 /**
  * Class DebitHelper
  *
@@ -300,21 +302,33 @@ class DebitHelper
         return $this->webstoreConfig;
     }
 
-    public function logQueueDebit(array $logs, int $orderId)
+    /**
+     * @param array $logs
+     * @param int|null $orderId
+     */
+    public function logQueueDebit(array $logs, int $orderId = null)
     {
+        $replacement = '****';
         foreach ($logs as $log) {
-            if (isset($log['contactBank'])) {
-                $replacement = '****';
-                if (is_array($log['contactBank'])) {
-                    $log['contactBank']['bankIban'] = $replacement;
-                    $log['contactBank']['iban'] = $replacement;
-                    $log['contactBank']['bankBic'] = $replacement;
-                    $log['contactBank']['bic'] = $replacement;
-                } else {
-                    $log['contactBank']->iban = $replacement;
-                    $log['contactBank']->bic = $replacement;
-                    $log['contactBank']->bankIban = $replacement;
-                    $log['contactBank']->bankBic = $replacement;
+            if (is_array($log)) {
+                foreach ($log as $logData) {
+                    if (is_array($logData)) {
+                        foreach ($logData as $logDataElem) {
+                            if (is_array($logDataElem)){
+                                foreach ($logDataElem as $key=>$value ){
+                                    if (stripos($key, 'iban') !== false || stripos($key, 'bic') !== false) {
+                                        $logDataElem[$key] = $replacement;
+                                    }
+                                }
+                            }
+                            else{
+                                //instance of ContactBank
+                                $logDataElem->iban = $replacement;
+                                $logDataElem->bic = $replacement;
+                            }
+                        }
+                    }
+
                 }
             }
         }

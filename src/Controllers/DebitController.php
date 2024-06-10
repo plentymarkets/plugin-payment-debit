@@ -131,7 +131,10 @@ class DebitController extends Controller
      */
     public function setBankDetails(Response $response, Request $request)
     {
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Set bank details', $request);
+        $logs = [];
+        $logs['step0-SetBankDetailsDesc'] = 'Set bank details';
+        $logs['step0-SetBankDetailsData']['request'] = $request;
+
         /** @var BasketRepositoryContract $basketRepo */
         $basketRepo = pluginApp(BasketRepositoryContract::class);
         $basket = $basketRepo->load();
@@ -145,7 +148,8 @@ class DebitController extends Controller
             'lastUpdateBy'  => 'customer'
         ];
 
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Current used bank data ', $bankData);
+        $logs['step01-UsedBankDetailsDesc'] = 'Current used bank data';
+        $logs['step01-UsedBankDetailsData']['bankData'] = $bankData;
         try
         {
             //check if this contactBank already exist
@@ -166,38 +170,47 @@ class DebitController extends Controller
                             && $contactBank->iban == $bankData['iban']
                             && $contactBank->bic == $bankData['bic']
                         ) {
-                            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Contact bank was found on contact', $contactBank);
+                            $logs['step02-FoundOnContactDesc'] = 'Contact bank was found on contact';
+                            $logs['step02-FoundOnContactData']['contactBank'] = $contactBank;
                             return true;
                         }
                     }
-                    $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Contact bank was Not found', $bankData);
+
+                    $logs['step03-ContactBankNotFoundDesc'] = 'Contact bank was Not found on contact';
+                    $logs['step03-ContactBankNotFoundData']['bankData'] = $bankData;
                     return false;
                 });
             }
 
             $bankData['lastUpdateBy'] = 'customer';
             if (!$contactBankExists) {
-                $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Contact bank doesn\'t exist. Contact bank will be created', $bankData);
+                $logs['step04-NotFoundContactBankDesc'] = 'Contact bank was Not found';
+                $logs['step04-NotFoundContactBankData']['bankData'] = $bankData;
                 /** @var ContactBank $newContactBank */
                 $newContactBank = $this->createContactBank($bankData);
-                $this->getLogger(PluginConstants::PLUGIN_NAME)->error('New contact bank was created ', $newContactBank);
+                $logs['step05-CreatedContactBankDesc'] = 'New contact bank was created';
+                $logs['step05-CreatedContactBankData']['bankData'] = $newContactBank;
             }
             $bankData['contactId'] = null;
             $bankData['directDebitMandateAvailable'] = 1;
             $bankData['directDebitMandateAt'] = date('Y-m-d H:i:s');
             $bankData['paymentMethod'] = 'onOff';
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Create contact bank with empty contactId ', $bankData);
+            $logs['step06-ToCreateContactBankEmptyContactIdDesc'] = 'Contact bank with empty contactId will be created';
+            $logs['step06-ToCreateContactBankEmptyContactIdData']['bankData'] = $bankData;
             $contactBank = $this->createContactBank($bankData);
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Contact bank with empty contactId was created', $bankData);
+            $logs['step07-CreatedContactBankEmptyContactIdDesc'] = 'Contact bank with empty contactId was created';
+            $logs['step07-CreatedContactBankEmptyContactIdData']['contactBank'] = $contactBank;
 
             $this->sessionStorageService->setSessionValue('contactBank', $contactBank);
-
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('place-order');
+            $logs['step08-FinalPlaceOrder'] = 'Success, go to place-order';
+            $this->debitHelper->logQueueDebit($logs);
             return $response->redirectTo($this->sessionStorageService->getLang() . '/place-order');
         }
         catch(\Exception $e)
         {
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Exception in contact bank processing', $e->getMessage());
+            $logs['step09-ContactCreationExceptionDesc'] = 'Exception in contact bank processing';
+            $logs['step09-ContactCreationExceptionData']['message'] = $e->getMessage();
+            $this->debitHelper->logQueueDebit($logs);
             return $response->redirectTo($this->sessionStorageService->getLang().'/checkout');
         }
     }
@@ -208,7 +221,10 @@ class DebitController extends Controller
      */
     public function updateBankDetails(Response $response, Request $request)
     {
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('UpdateBankDetails', $request);
+        $logs = [];
+        $logs['step0-UpdateBankDetailsDesc'] = 'Update bank details';
+        $logs['step0-UpdateBankDetailsData']['request'] = $request;
+
         $orderId = $request->get('orderId');
         $bankData = [
             'accountOwner'  => $request->get('bankAccountOwner'),
@@ -221,30 +237,37 @@ class DebitController extends Controller
         if ($request->has('bankId') && $request->get('bankId') > 0) {
             //update existing bank account
             $bankData['bankId'] = $request->get('bankId');
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Update existing bank account', $bankData);
+            $logs['step01-UpdateExistingBankAccountDesc'] = 'Update existing bank account';
+            $logs['step01-UpdateExistingBankAccountData']['bankData'] = $bankData;
             $contactBank = $this->updateContactBank($bankData);
         } else {
             //create new bank account
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Create bank account', $bankData);
+            $logs['step02-CreateBankAccountDesc'] = 'Create bank account';
+            $logs['step02-CreateBankAccountData']['bankData'] = $bankData;
             $contactBank = $this->createContactBank($bankData);
         }
 
         /** @var DebitHelper $debitHelper */
         $debitHelper = pluginApp(DebitHelper::class);
         // Create a plentymarkets payment
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Create Plenty payment', $contactBank);
+        $logs['step03-CreatePlentyPaymentDesc'] = 'Create Plenty payment';
+        $logs['step03-CreatePlentyPaymentData']['contactBank'] = $contactBank;
         $plentyPayment = $debitHelper->createPlentyPayment($orderId, $contactBank);
 
-
-
         if($plentyPayment instanceof Payment) {
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Created Plenty payment', $plentyPayment);
+            $logs['step04-CreatedPlentyPaymentDesc'] = 'Created Plenty payment';
+            $logs['step04-CreatedPlentyPaymentData']['plentyPayment'] = $plentyPayment;
+
             // Assign the payment to an order in plentymarkets
             $debitHelper->assignPlentyPaymentToPlentyOrder($plentyPayment, $orderId);
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Assigned Plenty payment to orderId', $orderId);
+            $logs['step05-AssignedPlentyPaymentDesc'] = 'Assigned Plenty payment to orderId';
+            $logs['step05-AssignedPlentyPaymentData']['orderId'] = $orderId;
         }
 
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Success, go to confirmation', $orderId);
+        $logs['step06-GoToConfirmationDesc'] = 'Success, go to confirmation page ';
+        $logs['step06-GoToConfirmationData']['orderId'] = $orderId;
+
+        $this->debitHelper->logQueueDebit($logs, $orderId);
         return $response->redirectTo($this->sessionStorageService->getLang().'/confirmation/'.$orderId);
     }
 
@@ -255,7 +278,10 @@ class DebitController extends Controller
      */
     private function createContactBank($bankData) {
 
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Started createContactBank', $bankData);
+        $logs = [];
+        $logs['step0-CreateContactBankDesc'] = 'Started createContactBank';
+        $logs['step0-CreateContactBankData']['bankData'] = $bankData;
+
         /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
@@ -263,19 +289,26 @@ class DebitController extends Controller
         $paymentRepo = pluginApp(ContactPaymentRepositoryContract::class);
 
         $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Create contact bank', $bankData);
+            $logs['step01-CreateContactBankDesc'] = 'Create contact bank';
+            $logs['step01-CreateContactBanktData']['bankData'] = $bankData;
             /** @var ContactBank $newContactBank */
             $newContactBank = $paymentRepo->createContactBank($bankData);
-            $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Created contact bank', $newContactBank);
+            $logs['step02-CreatedContactBankDesc'] = 'Created contact bank';
+            $logs['step02-CreatedContactBanktData']['newContactBank'] = $newContactBank;
             return $newContactBank;
         });
 
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Contact bank not created, return contact bank', $contactBank);
+
+
         return $contactBank;
     }
 
     private function updateContactBank($bankData) {
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Started updateContactBank', $bankData);
+
+        $logs = [];
+        $logs['step0-CurrentContactBankDesc'] = 'Started updateContactBank';
+        $logs['step0-CurrentContactBankData']['bankData'] = $bankData;
+
         /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
         $authHelper = pluginApp(AuthHelper::class);
 
@@ -285,7 +318,9 @@ class DebitController extends Controller
         $contactBank = $authHelper->processUnguarded(function () use ($paymentRepo, $bankData) {
             return $paymentRepo->updateContactBank($bankData, $bankData['bankId']);
         });
-        $this->getLogger(PluginConstants::PLUGIN_NAME)->error('Updated contact bank', $contactBank);
+        $logs['step01-CurrentContactBankDesc'] = 'Updated contact bank';
+        $logs['step01-CurrentContactBankData']['contactBank'] = $contactBank;
+        $this->debitHelper->logQueueDebit($logs);
         return $contactBank;
     }
 }
