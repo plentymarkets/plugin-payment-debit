@@ -320,11 +320,10 @@ class DebitHelper
                                         $logDataElem[$key] = $replacement;
                                     }
                                 }
+                                if (stripos($k, 'iban') !== false || stripos($k, 'bic') !== false) {
+                                    $logDataElem[$k] = $replacement;
+                                }
                             }
-                            if (stripos($k, 'iban') !== false || stripos($k, 'bic') !== false) {
-                                $logDataElem[$k] = $replacement;
-                            }
-
                         }
                     }
                     elseif($logData instanceof ContactBank){
