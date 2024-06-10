@@ -1,5 +1,10 @@
 # Release Notes für Lastschrift
 
+## 1.0.16 (TBA)
+
+### Hinzugefügt
+- Logs for bank order analysis.
+
 ## 1.0.15
 
 ### Behoben
