@@ -327,16 +327,15 @@ class DebitHelper
 
                         }
                     }
-                    elseif($logDataElem instanceof ContactBank){
+                    elseif($logData instanceof ContactBank){
                         //instance of ContactBank
-                        if (isset($logDataElem->iban)){
-                            $logDataElem->iban = $replacement;
+                        if (isset($logData->iban)){
+                            $logData->iban = $replacement;
                         }
-                        if (isset($logDataElem->bic)) {
-                            $logDataElem->bic = $replacement;
+                        if (isset($logData->bic)) {
+                            $logData->bic = $replacement;
                         }
                     }
-
                 }
             }
         }

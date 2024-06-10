@@ -157,7 +157,7 @@ class DebitController extends Controller
             if ($bankData['contactId'] != NULL) {
                 $logs['step01-CheckIfBankDetailExistDesc'] = 'Check if this contactBank already exist on user';
                 $logs['step01-CheckIfBankDetailExistData']['contactId'] = $bankData['contactId'];
-                $this->getLogger(PluginConstants::PLUGIN_NAME)->error(' ', );
+
                 /** @var \Plenty\Modules\Authorization\Services\AuthHelper $authHelper */
                 $authHelper = pluginApp(AuthHelper::class);
 
