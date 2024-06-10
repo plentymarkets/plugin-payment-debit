@@ -313,7 +313,7 @@ class DebitHelper
             if (is_array($log)) {
                 foreach ($log as $logData) {
                     if (is_array($logData)) {
-                        foreach ($logData as $logDataElem) {
+                        foreach ($logData as $k=>$logDataElem) {
                             if (is_array($logDataElem)){
                                 foreach ($logDataElem as $key=>$value ){
                                     if (stripos($key, 'iban') !== false || stripos($key, 'bic') !== false) {
@@ -321,11 +321,13 @@ class DebitHelper
                                     }
                                 }
                             }
+                            if (stripos($k, 'iban') !== false || stripos($k, 'bic') !== false) {
+                                $logDataElem[$k] = $replacement;
+                            }
 
                         }
                     }
-                    else{
-                    //elseif($logDataElem instanceof ContactBank){
+                    elseif($logDataElem instanceof ContactBank){
                         //instance of ContactBank
                         if (isset($logDataElem->iban)){
                             $logDataElem->iban = $replacement;
