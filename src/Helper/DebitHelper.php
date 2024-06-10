@@ -316,11 +316,11 @@ class DebitHelper
                         foreach ($logData as $k=>$logDataElem) {
                             if (is_array($logDataElem)){
                                 foreach ($logDataElem as $key=>$value ){
-                                    if (stripos($key, 'iban') !== false || stripos($key, 'bic') !== false) {
-                                        $logDataElem[$key] = $replacement;
+                                    if(in_array($key, ['iban', 'bic'])){
+                                       $logDataElem[$key] = $replacement;
                                     }
                                 }
-                                if (stripos($k, 'iban') !== false || stripos($k, 'bic') !== false) {
+                                if(in_array($k, ['iban', 'bic'])){
                                     $logData[$k] = $replacement;
                                 }
                             }
