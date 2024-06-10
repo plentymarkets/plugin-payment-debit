@@ -321,7 +321,7 @@ class DebitHelper
                                     }
                                 }
                             }
-                            else{
+                            elseif($logDataElem instanceof ContactBank){
                                 //instance of ContactBank
                                 $logDataElem->iban = $replacement;
                                 $logDataElem->bic = $replacement;
