@@ -133,7 +133,6 @@ class DebitController extends Controller
     {
         $logs = [];
         $logs['step0-SetBankDetailsDesc'] = 'Set bank details';
-        $logs['step0-SetBankDetailsData']['request'] = $request;
 
         /** @var BasketRepositoryContract $basketRepo */
         $basketRepo = pluginApp(BasketRepositoryContract::class);
@@ -225,7 +224,6 @@ class DebitController extends Controller
     {
         $logs = [];
         $logs['step0-UpdateBankDetailsDesc'] = 'Update bank details';
-        $logs['step0-UpdateBankDetailsData']['request'] = $request;
 
         $orderId = $request->get('orderId');
         $bankData = [
