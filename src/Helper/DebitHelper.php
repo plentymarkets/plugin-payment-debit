@@ -17,8 +17,6 @@ use Plenty\Modules\Payment\Models\PaymentProperty;
 use Plenty\Modules\System\Models\WebstoreConfiguration;
 use Plenty\Plugin\Log\Loggable;
 
-use function Termwind\ValueObjects\truncate;
-
 /**
  * Class DebitHelper
  *
