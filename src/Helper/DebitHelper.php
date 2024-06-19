@@ -308,6 +308,6 @@ class DebitHelper
     {
         $this->getLogger(PluginConstants::PLUGIN_NAME)
             ->addReference('orderId', $orderId)
-            ->debug('Checked for Debit operations - Result', $logs);
+            ->error('Checked for Debit operations - Result', $logs);
     }
 }
