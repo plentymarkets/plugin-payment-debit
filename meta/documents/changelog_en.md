@@ -1,9 +1,9 @@
 # Release Notes for Debit
 
-## 1.0.16 (TBA)
+## 1.0.16 (2024-06-25)
 
 ### Added
-- Logs for bank order analysis.
+- Logs for order analysis.
 
 ## 1.0.15
 
