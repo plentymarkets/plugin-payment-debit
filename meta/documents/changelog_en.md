@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.16 (2024-06-25)
+
+### Added
+- Logs for order analysis.
+
 ## 1.0.15
 
 ### Fixed

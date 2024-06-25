@@ -299,4 +299,15 @@ class DebitHelper
 
         return $this->webstoreConfig;
     }
+
+    /**
+     * @param array $logs
+     * @param int|null $orderId
+     */
+    public function logQueueDebit(array $logs, int $orderId = null)
+    {
+        $this->getLogger(PluginConstants::PLUGIN_NAME)
+            ->addReference('orderId', $orderId)
+            ->debug(PluginConstants::PLUGIN_NAME.'::general.operationsLogResult', $logs);
+    }
 }
