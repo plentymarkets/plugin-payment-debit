@@ -1,5 +1,10 @@
 # Release Notes for Debit
 
+## 1.0.17 (2026-02-25)
+
+### Fixed
+- Payment method name is translated correctly based on multilingualism settings.
+
 ## 1.0.16 (2024-06-25)
 
 ### Added
