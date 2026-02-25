@@ -182,7 +182,7 @@ class DebitPaymentMethod extends PaymentMethodBaseService
      */
     public function getName(string $lang = 'de'): string
     {
-        return $this->translator->trans("Debit::PaymentMethod.paymentMethodName");
+        return $this->translator->trans("Debit::PaymentMethod.paymentMethodName", [], $lang);
     }
 
     /**
