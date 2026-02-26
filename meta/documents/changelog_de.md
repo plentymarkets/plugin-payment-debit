@@ -1,5 +1,10 @@
 # Release Notes für Lastschrift
 
+## 1.0.17 (2026-02-25)
+
+### Behoben
+- Der Name der Zahlungsmethode wird entsprechend den Mehrsprachigkeitseinstellungen korrekt übersetzt.
+
 ## 1.0.16 (2024-06-25)
 
 ### Hinzugefügt
